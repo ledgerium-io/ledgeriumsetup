@@ -39,6 +39,9 @@ read -p 'MODE:' MODE
 echo "Enter domain name"
 read -p 'Domain Name:' Domain_Name
 
+echo "Enter external IP address"
+read -p 'External IP Address:' External_IPAddress
+
 if [ "$MODE" = "full" ]; then
 
 echo "+--------------------------------------------------------------------+"
@@ -54,50 +57,18 @@ var fs = require('fs');
 data.mode = "$MODE";
 data.nodeName = "$(hostname)";
 data.domainName = "$Domain_Name";
+data.externalIPAddress = "$External_IPAddress"
 
 //Output data
 fs.writeFileSync('./initialparams.json',JSON.stringify(data))
 
 EOF
 
+mkdir -p output/tmp &&
 node index.js &&
-cd ../ &&
-LED_NETWORK="$PWD/ledgeriumnetwork/.git"
+cd output &&
+docker-compose up -d
 
-#Check if ledgerium network is already a git repo
-    # If yes, Commit and push
-    # Else, init git, commit and push
-if [ -d "$LED_NETWORK" ]; then 
-echo "|****************** Ledgerium network folder exists *****************|"
-echo "|******** Commit and push files to ledgerium network github *********|"
-echo "+--------------------------------------------------------------------+"
-cd ledgeriumnetwork &&
-git add . &&
-git commit -m "Updates" &&
-git push -f https://github.com/ledgerium/ledgeriumnetwork.git feat/LB-95 &&
-cd ../ledgeriumtools/output &&
-docker-compose up -d &&
-echo "+--------------------------------------------------------------------+"
-echo "|***************** Docker Containers for nodes are up ***************|"
-echo "+--------------------------------------------------------------------+"
-
-else
-echo "|**************** Ledgerium network folder doesn't exist ************|"
-echo "|** Initialise, commit and push files to ledgerium network github ***|"
-echo "+--------------------------------------------------------------------+"
-cd ledgeriumnetwork &&
-git init &&
-git checkout -b feat/LB-95 &&
-git add . &&
-git commit -m "Updates" &&
-git push -f https://github.com/ledgerium/ledgeriumnetwork.git feat/LB-95 &&
-cd ../ledgeriumtools/output &&
-docker-compose up -d &&
-echo "+--------------------------------------------------------------------+"
-echo "|***************** Docker Containers for nodes are up ***************|"
-echo "+--------------------------------------------------------------------+"
-
-fi
 
 elif [ "$MODE" = "addon" ]; then
 echo "+--------------------------------------------------------------------+"
@@ -111,6 +82,7 @@ var fs = require('fs');
 data.mode = "$MODE";
 data.nodeName = "$(hostname)";
 data.domainName = "$Domain_Name";
+data.externalIPAddress = "$External_IPAddress"
 
 //Output data
 fs.writeFileSync('./initialparams.json',JSON.stringify(data))
@@ -127,7 +99,7 @@ echo "+--------------------------------------------------------------------+"
 
 cd ledgeriumnetwork &&
 git stash &&
-git pull -f https://github.com/ledgerium/ledgeriumnetwork feat/LB-95 &&
+git pull -f https://github.com/ledgerium/ledgeriumnetwork master &&
 cd ../
 
 else
@@ -136,14 +108,16 @@ echo "|**************** Ledgerium network deosn't exist *******************|"
 echo "|************ Cloning Ledgerium network from github *****************|"
 echo "+--------------------------------------------------------------------+"
 
-git clone -b feat/LB-95 https://github.com/ledgerium/ledgeriumnetwork
+git clone https://github.com/ledgerium/ledgeriumnetwork
 
 fi
 
 cp ledgeriumnetwork/* ledgeriumtools/output/tmp &&
 cd ledgeriumtools &&
-
-node index.js
+mkdir -p output/tmp &&
+node index.js &&
+cd output &&
+docker-compose up -d
 
 else
 echo "Invalid mode"

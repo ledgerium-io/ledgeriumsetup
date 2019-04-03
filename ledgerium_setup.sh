@@ -116,8 +116,8 @@ fi
 cd ledgeriumtools &&
 mkdir -p output/tmp &&
 echo "$PWD" && 
-cp ../ledgeriumnetwork/* ./output/tmp &&
 node index.js &&
+cp ../ledgeriumnetwork/* ./output/tmp &&
 cd output &&
 docker-compose up -d
 

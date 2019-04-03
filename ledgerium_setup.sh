@@ -65,6 +65,7 @@ fs.writeFileSync('./initialparams.json',JSON.stringify(data))
 EOF
 
 mkdir -p output/tmp &&
+mkdir -p output/fullnode &&
 node index.js &&
 cd output &&
 docker-compose up -d
@@ -112,9 +113,10 @@ git clone https://github.com/ledgerium/ledgeriumnetwork
 
 fi
 
-cp ledgeriumnetwork/* ledgeriumtools/output/tmp &&
 cd ledgeriumtools &&
 mkdir -p output/tmp &&
+echo "$PWD" && 
+cp ../ledgeriumnetwork/* ./output/tmp &&
 node index.js &&
 cd output &&
 docker-compose up -d

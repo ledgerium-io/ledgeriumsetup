@@ -65,6 +65,7 @@ fs.writeFileSync('./initialparams.json',JSON.stringify(data))
 EOF
 
 mkdir -p output/tmp &&
+mkdir -p output/fullnode &&
 node index.js &&
 cd output &&
 docker-compose up -d

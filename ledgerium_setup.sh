@@ -99,9 +99,9 @@ git clone https://github.com/ledgerium/ledgeriumnetwork
 
 fi
 
-mkdir -p ledgeriumtools/output/tmp &&
-cp ledgeriumnetwork/* ledgeriumtools/output/tmp &&
-cd ledgeriumtools
+cd ledgeriumtools &&
+mkdir -p output/tmp &&
+echo "$PWD"
 
 node <<EOF
 //Read data
@@ -122,7 +122,7 @@ data.externalIPAddress = externalIPAddress;
 fs.writeFileSync('./initialparams.json',JSON.stringify(data))
 EOF
 
-node index.js &&
+node index.js && cp ../ledgeriumnetwork/* ./output/tmp &&
 cd output &&
 docker-compose up -d
 

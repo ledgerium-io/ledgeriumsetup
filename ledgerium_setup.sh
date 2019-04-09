@@ -99,6 +99,7 @@ git clone https://github.com/ledgerium/ledgeriumnetwork
 
 fi
 
+mkdir -p ledgeriumtools/output/tmp &&
 cp ledgeriumnetwork/* ledgeriumtools/output/tmp &&
 cd ledgeriumtools
 

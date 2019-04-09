@@ -39,13 +39,13 @@ read -p 'MODE:' MODE
 echo "Enter domain name"
 read -p 'Domain Name:' Domain_Name
 
-echo "Enter external IP address"
-read -p 'External IP Address:' External_IPAddress
-
 if [ "$MODE" = "full" ]; then
 
 echo "+--------------------------------------------------------------------+"
 echo "|***************** Executing script for '$MODE' mode ****************|"
+
+echo "Enter external IP address"
+read -p 'External IP Address:' External_IPAddress
 
 node <<EOF
 
@@ -74,20 +74,6 @@ docker-compose up -d
 elif [ "$MODE" = "addon" ]; then
 echo "+--------------------------------------------------------------------+"
 echo "|***************** Executing script for '$MODE' mode ****************|"
-node <<EOF
-//Read data
-var data = require('./initialparams.json');
-var fs = require('fs');
-
-//Manipulate data
-data.mode = "$MODE";
-data.nodeName = "$(hostname)";
-data.domainName = "$Domain_Name";
-data.externalIPAddress = "$External_IPAddress"
-
-//Output data
-fs.writeFileSync('./initialparams.json',JSON.stringify(data))
-EOF
 
 cd ../
 LED_NETWORK="$PWD/ledgeriumnetwork"
@@ -113,11 +99,29 @@ git clone https://github.com/ledgerium/ledgeriumnetwork
 
 fi
 
-cd ledgeriumtools &&
-mkdir -p output/tmp &&
-echo "$PWD" && 
+cp ledgeriumnetwork/* ledgeriumtools/output/tmp &&
+cd ledgeriumtools
+
+node <<EOF
+//Read data
+var data = require('./initialparams.json');
+var fs = require('fs');
+
+var staticNodes = require('../ledgeriumnetwork/static-nodes.json');
+var enode = staticNodes[0];
+var externalIPAddress = (enode.split('@')[1]).split(':')[0];
+
+//Manipulate data
+data.mode = "$MODE";
+data.nodeName = "$(hostname)";
+data.domainName = "$Domain_Name";
+data.externalIPAddress = externalIPAddress;
+
+//Output data
+fs.writeFileSync('./initialparams.json',JSON.stringify(data))
+EOF
+
 node index.js &&
-cp ../ledgeriumnetwork/* ./output/tmp &&
 cd output &&
 docker-compose up -d
 

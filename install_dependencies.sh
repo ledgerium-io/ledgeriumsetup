@@ -2,10 +2,10 @@ echo "Installing updates"
 sudo apt-get update
 
 echo "Installing packages to allow apt to use a repository over HTTPS"
-sudo apt-get install \
+sudo apt-get install -y \
 apt-transport-https \
 ca-certificates \
-curl software-properties-common
+curl build-essential software-properties-common
 
 echo "Installing Docker"
 echo "Add Docker’s official GPG key"

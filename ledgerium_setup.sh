@@ -18,7 +18,7 @@ echo "|**************** Ledgerium tools folder doesn't exist *****************|"
 echo "|***************** Cloning ledgerium tools from github *****************|"
 echo "+-----------------------------------------------------------------------+"
 
-git clone http://github.com/ledgerium/ledgeriumtools &&
+git clone http://github.com/ledgerium-io/ledgeriumtools &&
 cd ledgeriumtools &&
 
 echo "+-----------------------------------------------------------------------+"
@@ -83,7 +83,7 @@ echo "+--------------------------------------------------------------------+"
 
 cd ledgeriumnetwork &&
 git stash &&
-git pull -f https://github.com/ledgerium/ledgeriumnetwork master &&
+git pull -f https://github.com/ledgerium-io/ledgeriumnetwork master &&
 cd ../
 
 else
@@ -92,7 +92,7 @@ echo "|**************** Ledgerium network deosn't exist *******************|"
 echo "|************ Cloning Ledgerium network from github *****************|"
 echo "+--------------------------------------------------------------------+"
 
-git clone https://github.com/ledgerium/ledgeriumnetwork
+git clone https://github.com/ledgerium-io/ledgeriumnetwork
 
 fi
 

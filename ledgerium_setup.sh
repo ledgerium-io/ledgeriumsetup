@@ -36,16 +36,13 @@ echo "+----------------------------------------------------------------------+"
 echo "Enter the type of node setup - full/addon"
 read -p 'MODE:' MODE
 
-echo "Enter domain name"
-read -p 'Domain Name:' Domain_Name
+IP=$(curl -s https://api.ipify.org)
+echo $IP
 
 if [ "$MODE" = "full" ]; then
 
 echo "+--------------------------------------------------------------------+"
 echo "|***************** Executing script for '$MODE' mode ****************|"
-
-echo "Enter external IP address"
-read -p 'External IP Address:' External_IPAddress
 
 node <<EOF
 
@@ -56,8 +53,8 @@ var fs = require('fs');
 //Manipulate data
 data.mode = "$MODE";
 data.nodeName = "$(hostname)";
-data.domainName = "$Domain_Name";
-data.externalIPAddress = "$External_IPAddress"
+data.domainName = "$(hostname)";
+data.externalIPAddress = "$IP"
 
 //Output data
 fs.writeFileSync('./initialparams.json',JSON.stringify(data))
@@ -115,7 +112,7 @@ var externalIPAddress = (enode.split('@')[1]).split(':')[0];
 //Manipulate data
 data.mode = "$MODE";
 data.nodeName = "$(hostname)";
-data.domainName = "$Domain_Name";
+data.domainName = "$(hostname)";
 data.externalIPAddress = externalIPAddress;
 
 //Output data

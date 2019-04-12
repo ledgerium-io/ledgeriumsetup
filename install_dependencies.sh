@@ -17,10 +17,10 @@ sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubun
 
 echo "Installing Docker CE"
 
-sudo apt-get update
+sudo apt-get update -y
 
 echo "Installing latest version of docker ce"
-sudo apt-get install docker-ce
+sudo apt-get install -y docker-ce
 
 echo "Testing docker"
 sudo docker run hello-world 
@@ -34,11 +34,11 @@ sudo curl -L "https://github.com/docker/compose/releases/download/1.23.2/docker-
 sudo chmod +x /usr/local/bin/docker-compose 
 
 echo "Installing NodeJS"
-sudo apt-get update && 
+sudo apt-get update -y && 
 sudo apt-get -y upgrade &&
 curl -sL https://deb.nodesource.com/setup_8.x -o nodesource_setup.sh &&
 sudo bash nodesource_setup.sh &&
-sudo apt-get install nodejs &&
+sudo apt-get install -y nodejs &&
 rm nodesource_setup.sh
 
 echo "Create docker network"

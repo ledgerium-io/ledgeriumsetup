@@ -22,7 +22,7 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
 
         # Timestamp function
         timestamp() {
-          date +"%Y_%m_%d-%H:%M:%S"
+          date +"%Y_%m_%d_%H_%M_%S"
         }
 
         DIR=$1
@@ -47,6 +47,31 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
 elif [[ "$OSTYPE" == "darwin"* ]]; then
         # Mac OSX
         echo "OS: $OSTYPE"
+
+        cd ../ledgeriumtools/output || exit
+        echo "Current folder - $PWD"
+
+        # Timestamp function
+        timestamp() {
+          date +"%Y_%m_%d_%H_%M_%S"
+        }
+
+        DIR=$1
+        echo "Backup folder $DIR"
+
+        echo 'Stopping all containers'
+        docker-compose down
+
+        echo 'Moving datastore files'
+        folder="$(timestamp)"_output
+        echo "$DIR"/"$folder"
+        mkdir -p "$DIR"/"$folder"
+        sudo mv -f validator-* "$DIR"/"$folder"
+        sudo mv -f tessera-* "$DIR"/"$folder"
+
+        echo 'Starting all containers'
+        docker-compose up -d
+        
 elif [[ "$OSTYPE" == "cygwin" ]]; then
         # POSIX compatibility layer and Linux environment emulation for Windows
         echo "OS: $OSTYPE"

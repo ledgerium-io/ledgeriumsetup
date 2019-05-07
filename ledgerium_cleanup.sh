@@ -1,5 +1,11 @@
 #!/bin/bash
 
+if [ -z "$1" ]
+  then
+    echo "Backup folder is not supplied"
+    exit 1
+fi
+
 if [[ "$OSTYPE" == "linux-gnu" ]]; then
     
     #Get Linux distribution
@@ -18,12 +24,6 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
         timestamp() {
           date +"%Y_%m_%d-%H:%M:%S"
         }
-
-        if [ -z "$1" ]
-          then
-            echo "Backup folder is not supplied"
-            exit 1
-        fi
 
         DIR=$1
         echo "Backup folder $DIR"

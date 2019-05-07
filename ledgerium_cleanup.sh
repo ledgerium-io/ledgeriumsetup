@@ -1,8 +1,10 @@
+#!/bin/bash
 cd ~/ledgerium/ledgeriumtools/output
+echo "Current folder - $PWD"
 
-echo $PWD
 DIR=$1
-echo $DIR
+echo "Backup folder $DIR"
+
 #DOP=( $(echo $(docker ps -a | grep ledgeriumcore | awk '{print $1}')) )
 
 #COUNTER=0;
@@ -17,14 +19,10 @@ docker-compose down
 
 echo 'Moving datastore files'
 mkdir -p $DIR/output
-mv tessera-* $DIR/output/
-mv validator-* $DIR/output/
+sudo mv tessera-* $DIR/output/
+sudo mv validator-* $DIR/output/
 #rm -rf tessera-*
 #rm -rf validator-*
 
 echo 'Starting all containers'
 docker-compose up -d
-
-
-
-

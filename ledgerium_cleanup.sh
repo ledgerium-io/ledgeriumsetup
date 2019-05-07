@@ -16,8 +16,8 @@ docker-compose down
 
 echo 'Moving datastore files'
 mkdir -p $DIR/output
-sudo mv tessera-* $DIR/output/
-sudo mv validator-* $DIR/output/
+sudo mv -f tessera-* $DIR/output/
+sudo mv -f validator-* $DIR/output/
 
 echo 'Starting all containers'
 docker-compose up -d

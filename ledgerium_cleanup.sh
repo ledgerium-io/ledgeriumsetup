@@ -2,6 +2,12 @@
 cd ~/ledgerium/ledgeriumtools/output
 echo "Current folder - $PWD"
 
+if [ -z "$1" ]
+  then
+    echo "Backup folder is not supplied"
+    exit 1
+fi
+
 DIR=$1
 echo "Backup folder $DIR"
 

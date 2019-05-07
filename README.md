@@ -29,6 +29,6 @@ This script prompts user for 2 parameters, type of mode (full/addon) and domain 
 
 ## Cleanup ledgerium node
 ```
-./ledgerium_cleanup.sh
+./ledgerium_cleanup.sh <backup folder path>
 ```
-This script takes back up the ledgeriumtools/output and relaunch all the docker containers to restart the node afresh. This script should only be used if ledgerium node needs to be resetup again. It is useful when there are issues in the node synching.
+This script takes back up of folder ledgeriumtools/output to the supplied backup path  and relaunch all the docker containers to restart the node afresh. This script should only be used if ledgerium node needs to be resetup again. It is useful when there are issues in the node synching.

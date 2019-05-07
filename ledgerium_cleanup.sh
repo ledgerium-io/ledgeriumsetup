@@ -32,7 +32,7 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
         docker-compose down
 
         echo 'Moving datastore files'
-        folder="$(timestamp)"_output
+        folder=output_"$(timestamp)"
         mkdir -p "$DIR"/"$folder"
         sudo mv -f tessera-* "$DIR"/"$folder"
         sudo mv -f validator-* "$DIR"/"$folder"
@@ -63,7 +63,7 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
         docker-compose down
 
         echo 'Moving datastore files'
-        folder="$(timestamp)"_output
+        folder=output_"$(timestamp)"
         echo "$DIR"/"$folder"
         mkdir -p "$DIR"/"$folder"
         sudo mv -f validator-* "$DIR"/"$folder"

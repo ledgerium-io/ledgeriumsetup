@@ -1,17 +1,89 @@
 #!/bin/bash
-cd ~/ledgerium/ledgeriumtools/output
-echo "Current folder - $PWD"
 
-DIR=$1
-echo "Backup folder $DIR"
+if [ -z "$1" ]
+  then
+    echo "Backup folder is not supplied"
+    exit 1
+fi
 
-echo 'Stopping all containers'
-docker-compose down
+if [[ "$OSTYPE" == "linux-gnu" ]]; then
+    
+    #Get Linux distribution
+    DIST=$(cat /proc/version)
 
-echo 'Moving datastore files'
-mkdir -p $DIR/output
-sudo mv tessera-* $DIR/output/
-sudo mv validator-* $DIR/output/
+    #Ubuntu or CentOS
+    if 
+    [[ $DIST == *"Ubuntu"* ]] ||
+    [[ $DIST == *"centos"* ]]; then
+        echo "OS: $DIST"
 
-echo 'Starting all containers'
-docker-compose up -d
+        cd ../ledgeriumtools/output || exit
+        echo "Current folder - $PWD"
+
+        # Timestamp function
+        timestamp() {
+          date +"%Y_%m_%d_%H_%M_%S"
+        }
+
+        DIR=$1
+        echo "Backup folder $DIR"
+
+        echo 'Stopping all containers'
+        docker-compose down
+
+        echo 'Moving datastore files'
+        folder=output_"$(timestamp)"
+        mkdir -p "$DIR"/"$folder"
+        sudo mv -f tessera-* "$DIR"/"$folder"
+        sudo mv -f validator-* "$DIR"/"$folder"
+
+        echo 'Starting all containers'
+        docker-compose up -d
+    
+    else
+        echo "Unknown linux distribution"
+    fi
+
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+        # Mac OSX
+        echo "OS: $OSTYPE"
+
+        cd ../ledgeriumtools/output || exit
+        echo "Current folder - $PWD"
+
+        # Timestamp function
+        timestamp() {
+          date +"%Y_%m_%d_%H_%M_%S"
+        }
+
+        DIR=$1
+        echo "Backup folder $DIR"
+
+        echo 'Stopping all containers'
+        docker-compose down
+
+        echo 'Moving datastore files'
+        folder=output_"$(timestamp)"
+        echo "$DIR"/"$folder"
+        mkdir -p "$DIR"/"$folder"
+        sudo mv -f validator-* "$DIR"/"$folder"
+        sudo mv -f tessera-* "$DIR"/"$folder"
+
+        echo 'Starting all containers'
+        docker-compose up -d
+        
+elif [[ "$OSTYPE" == "cygwin" ]]; then
+        # POSIX compatibility layer and Linux environment emulation for Windows
+        echo "OS: $OSTYPE"
+elif [[ "$OSTYPE" == "msys" ]]; then
+        # Lightweight shell and GNU utilities compiled for Windows (part of MinGW)
+        echo "OS: $OSTYPE"
+elif [[ "$OSTYPE" == "win32" ]]; then
+        echo "OS: $OSTYPE"
+elif [[ "$OSTYPE" == "freebsd"* ]]; then
+        # ...
+        echo "OS: $OSTYPE"
+else
+        # Unknown.
+        echo "Unknown OS: $OSTYPE"
+fi

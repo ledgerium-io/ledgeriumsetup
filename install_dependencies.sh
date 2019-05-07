@@ -1,7 +1,7 @@
-if [[ "$OSTYPE" == "linux-gnu" ]]; then
-    
-    #Get Linux distribution
-    DIST=$(cat /proc/version)
+#!/bin/bash
+
+echo "Installing updates"
+sudo apt-get update
 
     #Ubuntu
     if [[ $DIST == *"Ubuntu"* ]]; then

@@ -1,8 +1,9 @@
 #!/bin/bash
 
 echo "Installing updates"
-sudo apt-get update
-
+if [[ "$OSTYPE" == "linux-gnu" ]]; then
+     #Get Linux distribution
+    DIST=$(cat /proc/version)
     #Ubuntu
     if [[ $DIST == *"Ubuntu"* ]]; then
             echo "OS: $DIST"
@@ -98,9 +99,27 @@ sudo apt-get update
             echo "Create docker network"
             sudo docker network create -d bridge --subnet 172.19.240.0/24 --gateway 172.19.240.1 test_net
 
+    else
+        echo "Unknown linux distribution"
+    fi        
+
 elif [[ "$OSTYPE" == "darwin"* ]]; then
         # Mac OSX
         echo "OS: $OSTYPE"
+        echo "OS: $DIST"
+            
+            echo "Install git"
+            sudo brew install git
+
+            echo "Testing docker"
+            sudo docker run hello-world 
+
+            echo "Installing NodeJS"
+            brew install node
+
+            echo "Create docker network"
+            sudo docker network create -d bridge --subnet 172.19.240.0/24 --gateway 172.19.240.1 test_net
+
 elif [[ "$OSTYPE" == "cygwin" ]]; then
         # POSIX compatibility layer and Linux environment emulation for Windows
         echo "OS: $OSTYPE"

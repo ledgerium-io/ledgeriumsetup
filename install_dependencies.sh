@@ -98,10 +98,6 @@ sudo apt-get update
             echo "Create docker network"
             sudo docker network create -d bridge --subnet 172.19.240.0/24 --gateway 172.19.240.1 test_net
 
-    else
-        echo "Unknown linux distribution"
-    fi
-
 elif [[ "$OSTYPE" == "darwin"* ]]; then
         # Mac OSX
         echo "OS: $OSTYPE"

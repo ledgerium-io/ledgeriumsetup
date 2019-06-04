@@ -63,11 +63,60 @@ fs.writeFileSync('./initialparams.json',JSON.stringify(data))
 
 EOF
 
-mkdir -p output/tmp &&
-mkdir -p output/fullnode &&
-node index.js &&
-cd output &&
-docker-compose up -d
+if [ "$1" = "true" ]; then
+    echo "Distributed Setup :: True"
+
+    mkdir -p output/tmp         &&
+    mkdir -p output/fullnode    &&
+    node index.js               &&
+    cd output                   &&
+
+    #Read static-nodes.json
+    value=$(<tmp/static-nodes.json)
+    
+    # Convert 'value' to an array
+    IFS=',()][' read -r -a array <<<$value
+
+    for index in ${!array[@]}; 
+    do
+        if [ $index = 0 ]; then
+            # Skip 0th element of array
+            echo "Skip 0th element of array"
+        elif [ $index = 1 ]; then 
+            echo "First node will be run in same host"
+            docker-compose up -d
+        else
+            echo "Remaining nodes will be run on remote servers"
+            #Split with '@' and take second part
+            A="$(echo ${array[$index]} | cut -d'@' -f2)"                                    &&
+            #Split with ':' and take first part which is IP Address
+            B="$(echo $A | cut -d':' -f1)"                                                  &&
+
+            FOLDER=node_$((index-1))                                                        &&
+            mkdir -p $FOLDER/tmp                                                            &&
+            cp .env $FOLDER                                                                 &&
+            cp fullnode/"docker-compose_$((index-1))_$B.yml" $FOLDER/docker-compose.yml     &&
+            cp tmp/genesis.json $FOLDER/tmp                                                 &&
+            cp tmp/nodesdetails.json $FOLDER/tmp                                            &&
+            cp tmp/privatekeys.json $FOLDER/tmp                                             &&
+            cp tmp/static-nodes.json $FOLDER/tmp                                            &&
+            echo "*** Enter username for $B ***"                                            &&
+            read -p 'Username:' username                                                    &&
+            echo "*** Enter password to start scp ***"                                      &&
+            scp -r $FOLDER/* $username@$B:~/ledgerium/ledgeriumtools/output
+            echo "*** Enter password to start bring up docker containers ***"                 
+            ssh $username@$B "cd ~/ledgerium/ledgeriumtools/test && docker-compose up -d" 
+        fi
+    done
+    
+else
+    echo "Distributed Setup :: False"
+    mkdir -p output/tmp &&
+    mkdir -p output/fullnode &&
+    node index.js &&
+    cd output &&
+    docker-compose up -d
+fi
 
 
 elif [ "$MODE" = "addon" ]; then

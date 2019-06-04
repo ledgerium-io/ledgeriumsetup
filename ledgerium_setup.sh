@@ -105,8 +105,10 @@ if [ "$1" = "true" ]; then
             read -p 'Username:' username                                                    &&
             echo "*** Enter password to start scp ***"                                      &&
             scp -r $FOLDER/* $username@$B:~/ledgerium/ledgeriumtools/output
+            echo "*** Enter password to copy .env ***"                                      &&
+            scp -r $FOLDER/.env $username@$B:~/ledgerium/ledgeriumtools/output
             echo "*** Enter password to start bring up docker containers ***"                 
-            ssh $username@$B "cd ~/ledgerium/ledgeriumtools/test && docker-compose up -d" 
+            ssh $username@$B "cd ~/ledgerium/ledgeriumtools/output && docker-compose up -d" 
         fi
     done
     

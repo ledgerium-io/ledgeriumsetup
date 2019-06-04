@@ -79,19 +79,20 @@ if [ "$1" = "true" ]; then
 
     for index in ${!array[@]}; 
     do
+        echo "Remaining nodes will be run on remote servers"
+        #Split with '@' and take second part
+        A="$(echo ${array[$index]} | cut -d'@' -f2)"                                    &&
+        #Split with ':' and take first part which is IP Address
+        B="$(echo $A | cut -d':' -f1)"
+
         if [ $index = 0 ]; then
             # Skip 0th element of array
             echo "Skip 0th element of array"
         elif [ $index = 1 ]; then 
             echo "First node will be run in same host"
+            cp fullnode/"docker-compose_$((index-1))_$B.yml" docker-compose.yml
             docker-compose up -d
         else
-            echo "Remaining nodes will be run on remote servers"
-            #Split with '@' and take second part
-            A="$(echo ${array[$index]} | cut -d'@' -f2)"                                    &&
-            #Split with ':' and take first part which is IP Address
-            B="$(echo $A | cut -d':' -f1)"                                                  &&
-
             FOLDER=node_$((index-1))                                                        &&
             mkdir -p $FOLDER/tmp                                                            &&
             cp .env $FOLDER                                                                 &&

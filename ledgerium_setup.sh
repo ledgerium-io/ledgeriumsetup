@@ -45,7 +45,7 @@ node <<EOF
     var fs = require('fs');
 
     //Manipulate data
-    data.mode = full";
+    data.mode = "full";
     data.nodeName = "$(hostname)";
     data.domainName = "$(hostname)";
     data.externalIPAddress = "$IP"

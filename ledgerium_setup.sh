@@ -113,11 +113,11 @@ EOF
     else 
         
         # Enter the type of node setup
-        echo "Enter the type of node setup - full/addon"
+        echo "Enter the type of node setup - full/master"
         read -p 'MODE:' MODE
 
         IP=$(curl -s https://api.ipify.org)
-        
+
         if [ "$MODE" = "full" ]; then
 
         echo "+--------------------------------------------------------------------+"
@@ -149,7 +149,7 @@ EOF
         docker-compose up -d
 
 
-        elif [ "$MODE" = "addon" ]; then
+        elif [ "$MODE" = "master" ]; then
         echo "+--------------------------------------------------------------------+"
         echo "|***************** Executing script for '$MODE' mode ****************|"
 

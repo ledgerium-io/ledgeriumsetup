@@ -1,6 +1,6 @@
 # ledgeriumsetup
 
-Provides a shell script to deploy nodes in full/addon mode
+Provides a shell script to deploy nodes in full/masternode mode
 
 ## Install Dependencies
 
@@ -24,10 +24,16 @@ To update docker group, log out and log back in so that your group membership is
 
 ## Launch Ledgerium Node
 ```
-bash ./ledgerium_setup.sh
-```
-This script prompts user for 2 parameters, type of mode (full/addon) and domain name, creates a docker-compose file and brings up the cointainers
+./ledgerium_setup.sh <NetworkID> <Distributed>
 
+USAGE: ledgerium_setup.sh 2019 false
+OPTIONS:
+    NetworkID    networkid : 2019
+    Distributed  whether nodes to be setup on distributed machines or locally : true/false
+
+Later, it will ask for further parameters
+* Type of mode (full/masternode) and domain name, creates a docker-compose file and brings up the cointainers
+```
 ## Cleanup Ledgerium Node
 ```
 ./ledgerium_cleanup.sh <backup folder path>

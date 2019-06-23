@@ -1,7 +1,12 @@
 #!/bin/bash
 
 if [ $# -eq 0 ]; then
-    echo "No arguments provided"
+    usage="USAGE: ledgerium_setup.sh 2019 false
+    OPTIONS:
+    NetworkID    networkid : 2019
+    Distributed  whether nodes to be setup on distributed machines or locally : true/false" 
+    echo "No arguments provided." 
+    echo "$usage" 
     exit 1
 else
     cd ../

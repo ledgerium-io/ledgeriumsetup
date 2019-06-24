@@ -29,7 +29,7 @@ else
         echo "|***************** Cloning ledgerium tools from github *****************|"
         echo "+-----------------------------------------------------------------------+"
 
-        git clone -b feat/LB-187 http://github.com/ledgerium-io/ledgeriumtools &&
+        git clone http://github.com/ledgerium-io/ledgeriumtools &&
         cd ledgeriumtools &&
 
         echo "+-----------------------------------------------------------------------+"

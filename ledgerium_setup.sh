@@ -1,9 +1,8 @@
 #!/bin/bash
 
 if [ $# -eq 0 ]; then
-    usage="USAGE: ledgerium_setup.sh 2019 false
+    usage="USAGE: ledgerium_setup.sh false
     OPTIONS:
-    NetworkID    networkid : 2019
     Distributed  whether nodes to be setup on distributed machines or locally : true/false" 
     echo "No arguments provided." 
     echo "$usage" 
@@ -31,10 +30,11 @@ else
 
         git clone http://github.com/ledgerium-io/ledgeriumtools &&
         cd ledgeriumtools &&
+        git checkout feat/LB-187 &&
 
-        echo "+-----------------------------------------------------------------------+"
-        echo "|********************** Installing node modules ************************|"
         echo "+-----------------------------------------------------------------------+" 
+        echo "|********************** Installing node modules ************************|" 
+        echo "+-----------------------------------------------------------------------+"  
 
         npm install 
 
@@ -50,6 +50,7 @@ else
         # Enter Network ID
         echo "Enter Network ID"
         read -p 'Network ID:' NETWORKID
+        IP=$(curl -s https://api.ipify.org)      
         
         node <<EOF
 
@@ -59,6 +60,7 @@ else
 
             //Manipulate data
             data.mode = "full";
+            data.distributed = $1;
             data.nodeName = "$(hostname)";
             data.domainName = "$(hostname)";
             data.externalIPAddress = "$IP";
@@ -144,6 +146,7 @@ EOF
 
             //Manipulate data
             data.mode = "$MODE";
+            data.distributed = false;
             data.nodeName = "$(hostname)";
             data.domainName = "$(hostname)";
             data.externalIPAddress = "$IP";
@@ -207,6 +210,7 @@ EOF
 
             //Manipulate data
             data.mode = "$MODE";
+            data.distributed = false;
             data.nodeName = "$(hostname)";
             data.domainName = "$(hostname)";
             data.externalIPAddress = externalIPAddress;

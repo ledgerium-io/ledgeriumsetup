@@ -20,7 +20,8 @@ if [ -d "$DIRECTORY" ]; then
     echo "+-----------------------------------------------------------------------+"
 
     git clone http://github.com/ledgerium-io/ledgeriumtools &&
-    cd ledgeriumtools 
+    cd ledgeriumtools &&
+    git checkout feat/domain_name
 
     echo "+-----------------------------------------------------------------------+" 
     echo "|********************** Installing node modules ************************|" 

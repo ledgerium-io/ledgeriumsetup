@@ -104,7 +104,7 @@ EOF
                 FOLDER=node_$((index-1))                                                        &&
                 mkdir -p $FOLDER/tmp                                                            &&
                 cp fullnode/".env$((index-1))" $FOLDER                                                                 &&
-                cp fullnode/"docker-compose_$((index-1))_$B.yml" $FOLDER/docker-compose.yml     &&
+                cp fullnode/"docker-compose_$((index-1)).yml" $FOLDER/docker-compose.yml     &&
                 cp fullnode/tmp/"privatekeys$((index-1)).json" tmp/nodesdetails.json tmp/genesis.json tmp/static-nodes.json $FOLDER/tmp                                            &&
                 echo "*** Enter username for $B ***"                                            &&
                 read -p 'Username:' username                                                    &&

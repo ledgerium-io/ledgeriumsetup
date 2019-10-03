@@ -99,7 +99,7 @@ EOF
                 echo "Skip 0th element of array"
             elif [ $index = 1 ]; then 
                 echo "First node will be run in same host"
-                cp fullnode/"docker-compose_$((index-1))_$B.yml" docker-compose.yml
+                cp fullnode/"docker-compose_$((index-1)).yml" docker-compose.yml
                 docker-compose up -d
             else
                 FOLDER=node_$((index-1))                                                        &&

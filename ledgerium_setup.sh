@@ -106,17 +106,16 @@ EOF
                 mkdir -p $FOLDER/tmp                                                            &&
                 cp fullnode/".env$((index-1))" $FOLDER/.env                                                                 &&
                 cp fullnode/"docker-compose_$((index-1)).yml" $FOLDER/docker-compose.yml     &&
-                cp fullnode/tmp/"privatekeys$((index-1)).json" tmp/nodesdetails.json tmp/genesis.json tmp/static-nodes.json $FOLDER/tmp                                            &&
+                cp fullnode/tmp/"privatekeys$((index-1)).json" $FOLDER/tmp/privatekeys.json  &&
+                cp tmp/nodesdetails.json tmp/genesis.json tmp/static-nodes.json $FOLDER/tmp                                            &&
                 echo "*** Enter username for $B ***"                                            &&
                 read -p 'Username:' username                                                    &&
                 echo "*** Enter password to create folder structure ***"                        &&
                 ssh $username@$B "cd ~/ledgerium/ && mkdir -p ledgeriumtools/output/tmp"        &&
                 echo "*** Enter password to start copying files ***"                            &&
                 scp -r $FOLDER/* $FOLDER/.env $username@$B:~/ledgerium/ledgeriumtools/output                 &&
-                # echo "*** Enter password to copy .env ***"                                      &&
-                # scp -r $FOLDER/.env $username@$B:~/ledgerium/ledgeriumtools/output              &&
                 echo "*** Enter password to start bring up docker containers ***"                 
-                # ssh $username@$B "cd ~/ledgerium/ledgeriumtools/output && docker-compose up -d" 
+                ssh $username@$B "cd ~/ledgerium/ledgeriumtools/output && docker-compose up -d" 
             fi
         done
     else

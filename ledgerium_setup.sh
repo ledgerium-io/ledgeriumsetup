@@ -119,8 +119,7 @@ EOF
             fi
         done
         echo "*** Removing files from fullnode ***"
-        sudo rm -rf fullnode/*
-        mkdir -p fullnode/tmp
+        sudo rm -rf fullnode
     else
         echo "|***************** Executing script for local full mode ****************|"
         # Enter Network ID

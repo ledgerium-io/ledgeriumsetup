@@ -118,6 +118,9 @@ EOF
                 ssh $username@$B "cd ~/ledgerium/ledgeriumtools/output && docker-compose up -d" 
             fi
         done
+        echo "*** Removing files from fullnode ***"
+        sudo rm -rf fullnode/*
+        mkdir -p fullnode/tmp
     else
         echo "|***************** Executing script for local full mode ****************|"
         # Enter Network ID

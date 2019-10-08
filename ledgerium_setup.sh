@@ -62,7 +62,7 @@ if [ "$MODE" = "full" ]; then
 
             //Manipulate data
             data.mode = "full";
-            data.distributed = $DISTRIBUTED;
+            data.distributed = true;
             data.nodeName = "$(hostname)";
             data.domainName = "$(hostname)";
             data.externalIPAddress = "$IP";

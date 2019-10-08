@@ -35,7 +35,7 @@ echo "|***************** Running ledgerium tools application *****************|"
 echo "+----------------------------------------------------------------------+"
 
 # Enter the type of node setup
-echo "Enter the type of node setup - full/masternode"
+echo "Enter the type of node setup - full/blockproducer"
 read -p 'MODE:' MODE
 
 IP=$(curl -s https://api.ipify.org)
@@ -43,10 +43,10 @@ IP=$(curl -s https://api.ipify.org)
 if [ "$MODE" = "full" ]; then
 
     # Enter the type of node setup
-    echo "Is this distributed setup - true/false"
+    echo "Is this distributed setup - yes/no"
     read -p 'DISTRIBUTED:' DISTRIBUTED
 
-    if [ "$DISTRIBUTED" = "true" ]; then
+    if [ "$DISTRIBUTED" = "yes" ]; then
 
         echo "|***************** Executing script for distributed full mode ****************|"
         
@@ -119,7 +119,7 @@ EOF
             fi
         done
         echo "*** Removing files from fullnode ***"
-        sudo rm -rf fullnode
+        sudo rm -rf fullnode node_*
     else
         echo "|***************** Executing script for local full mode ****************|"
         # Enter Network ID
@@ -155,7 +155,7 @@ EOF
         cd output &&
         docker-compose up -d
     fi
-elif [ "$MODE" = "masternode" ]; then
+elif [ "$MODE" = "blockproducer" ]; then
     echo "+--------------------------------------------------------------------+"
     echo "|***************** Executing script for '$MODE' mode ****************|"
 

@@ -159,6 +159,15 @@ elif [ "$MODE" = "blockproducer" ]; then
     echo "+--------------------------------------------------------------------+"
     echo "|***************** Executing script for '$MODE' mode ****************|"
 
+    # Enter the folder name to pick network files
+    echo "Enter the testnet - Ex: flinders/toorak"
+    read -p 'TESTNET:' TESTNET
+
+    FLAG=false;
+    if [ "$TESTNET" = "flinders" ]; then 
+        FLAG=true
+    fi
+
     cd ../
     LED_NETWORK="$PWD/ledgeriumnetwork"
 
@@ -179,7 +188,10 @@ elif [ "$MODE" = "blockproducer" ]; then
         echo "|************ Cloning Ledgerium network from github *****************|"
         echo "+--------------------------------------------------------------------+"
 
-        git clone https://github.com/ledgerium-io/ledgeriumnetwork
+        git clone https://github.com/ledgerium-io/ledgeriumnetwork &&
+        cd ledgeriumnetwork &&
+        git checkout bp &&
+        cd ..
 
     fi
 
@@ -192,15 +204,16 @@ elif [ "$MODE" = "blockproducer" ]; then
         var data = require('./initialparams.json');
         var fs = require('fs');
 
-        var staticNodes = require('../ledgeriumnetwork/static-nodes.json');
-        var genesisInfo = require('../ledgeriumnetwork/genesis.json');
+        var staticNodes = require('../ledgeriumnetwork/$TESTNET/static-nodes.json');
+        var genesisInfo = require('../ledgeriumnetwork/$TESTNET/genesis.json');
         var enode = staticNodes[0];
         var externalIPAddress = (enode.split('@')[1]).split(':')[0];
         var networkId = genesisInfo.config.chainId;
 
         //Manipulate data
         data.mode = "$MODE";
-        data.distributed = false;
+        data.distributed = $FLAG;
+        data.network = "$TESTNET";
         data.nodeName = "$(hostname)";
         data.domainName = "$(hostname)";
         data.externalIPAddress = externalIPAddress;
@@ -209,9 +222,10 @@ elif [ "$MODE" = "blockproducer" ]; then
         //Output data
         fs.writeFileSync('./initialparams.json',JSON.stringify(data))
 EOF
-    node index.js && cp ../ledgeriumnetwork/* ./output/tmp &&
-    cd output &&
-    docker-compose up -d
+    cp ../ledgeriumnetwork/$TESTNET/* ./output/tmp &&
+    node index.js && 
+    cd output 
+    # docker-compose up -d
 else
         echo "Invalid mode :: $MODE"
 fi

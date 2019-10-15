@@ -222,8 +222,8 @@ elif [ "$MODE" = "blockproducer" ]; then
         //Output data
         fs.writeFileSync('./initialparams.json',JSON.stringify(data))
 EOF
-    cp ../ledgeriumnetwork/$TESTNET/* ./output/tmp &&
     node index.js && 
+    cp ../ledgeriumnetwork/$TESTNET/* ./output/tmp &&
     cd output 
     # docker-compose up -d
 else

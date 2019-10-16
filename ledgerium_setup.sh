@@ -140,6 +140,7 @@ EOF
         //Manipulate data
         data.mode = "full";
         data.distributed = false;
+        data.network="toorak";
         data.nodeName = "$(hostname)";
         data.domainName = "$(hostname)";
         data.externalIPAddress = "$IP";

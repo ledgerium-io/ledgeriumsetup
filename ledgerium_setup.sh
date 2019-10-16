@@ -21,7 +21,7 @@ if [ -d "$DIRECTORY" ]; then
 
     git clone http://github.com/ledgerium-io/ledgeriumtools &&
     cd ledgeriumtools &&
-    git checkout feat/domain_name
+    git checkout bp
 
     echo "+-----------------------------------------------------------------------+" 
     echo "|********************** Installing node modules ************************|" 
@@ -224,8 +224,8 @@ elif [ "$MODE" = "blockproducer" ]; then
 EOF
     node index.js && 
     cp ../ledgeriumnetwork/$TESTNET/* ./output/tmp &&
-    cd output 
-    # docker-compose up -d
+    cd output &&
+    docker-compose up -d
 else
         echo "Invalid mode :: $MODE"
 fi

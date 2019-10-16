@@ -20,8 +20,7 @@ if [ -d "$DIRECTORY" ]; then
     echo "+-----------------------------------------------------------------------+"
 
     git clone http://github.com/ledgerium-io/ledgeriumtools &&
-    cd ledgeriumtools &&
-    git checkout bp_update
+    cd ledgeriumtools
 
     echo "+-----------------------------------------------------------------------+" 
     echo "|********************** Installing node modules ************************|" 
@@ -188,20 +187,17 @@ elif [ $MODE = "1" ]; then
         echo "+--------------------------------------------------------------------+"
 
         cd ledgeriumnetwork &&
-        # git stash &&
-        # git pull -f https://github.com/ledgerium-io/ledgeriumnetwork master &&
+        git stash &&
+        git pull -f https://github.com/ledgerium-io/ledgeriumnetwork master &&
         cd ../
 
     else
 
-        echo "|**************** Ledgerium network deosn't exist *******************|"
+        echro "|**************** Ledgerium network deosn't exist *******************|"
         echo "|************ Cloning Ledgerium network from github *****************|"
         echo "+--------------------------------------------------------------------+"
 
-        git clone https://github.com/ledgerium-io/ledgeriumnetwork &&
-        cd ledgeriumnetwork &&
-        git checkout bp &&
-        cd ..
+        git clone https://github.com/ledgerium-io/ledgeriumnetwork
 
     fi
 

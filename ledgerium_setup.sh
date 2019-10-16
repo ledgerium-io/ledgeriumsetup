@@ -35,12 +35,14 @@ echo "|***************** Running ledgerium tools application *****************|"
 echo "+----------------------------------------------------------------------+"
 
 # Enter the type of node setup
-echo "Enter the type of node setup - full/blockproducer"
+echo "Select the type of node setup - 0/1"
+echo "0 - full"
+echo "1 - blockproducer"
 read -p 'MODE:' MODE
 
 IP=$(curl -s https://api.ipify.org)
 
-if [ "$MODE" = "full" ]; then
+if [ $MODE = "0" ]; then
 
     # Enter the type of node setup
     echo "Is this distributed setup - yes/no"
@@ -127,7 +129,6 @@ EOF
         read -p 'Network ID:' NETWORKID
         
         echo "+--------------------------------------------------------------------+"
-        echo "|***************** Executing script for '$MODE' mode ****************|"
 
         node <<EOF
 
@@ -136,7 +137,7 @@ EOF
         var fs = require('fs');
 
         //Manipulate data
-        data.mode = "$MODE";
+        data.mode = "full";
         data.distributed = false;
         data.nodeName = "$(hostname)";
         data.domainName = "$(hostname)";
@@ -155,17 +156,24 @@ EOF
         cd output &&
         docker-compose up -d
     fi
-elif [ "$MODE" = "blockproducer" ]; then
+elif [ $MODE = "1" ]; then
     echo "+--------------------------------------------------------------------+"
-    echo "|***************** Executing script for '$MODE' mode ****************|"
+    echo "|***************** Executing script for blockproducer mode ****************|"
 
     # Enter the folder name to pick network files
-    echo "Enter the testnet - Ex: flinders/toorak"
+    echo "Enter the testnet - 0/1"
+    echo "0 - toorak"
+    echo "1 - flinders"
     read -p 'TESTNET:' TESTNET
 
     FLAG=false;
-    if [ "$TESTNET" = "flinders" ]; then 
+    NETWORK="TOORAK"
+    if [ $TESTNET = "0" ]; then 
+        FLAG=false
+        NETWORK="toorak"
+    else
         FLAG=true
+        NETWORK="flinders"
     fi
 
     cd ../
@@ -204,16 +212,16 @@ elif [ "$MODE" = "blockproducer" ]; then
         var data = require('./initialparams.json');
         var fs = require('fs');
 
-        var staticNodes = require('../ledgeriumnetwork/$TESTNET/static-nodes.json');
-        var genesisInfo = require('../ledgeriumnetwork/$TESTNET/genesis.json');
+        var staticNodes = require('../ledgeriumnetwork/$NETWORK/static-nodes.json');
+        var genesisInfo = require('../ledgeriumnetwork/$NETWORK/genesis.json');
         var enode = staticNodes[0];
         var externalIPAddress = (enode.split('@')[1]).split(':')[0];
         var networkId = genesisInfo.config.chainId;
 
         //Manipulate data
-        data.mode = "$MODE";
+        data.mode = "blockproducer";
         data.distributed = $FLAG;
-        data.network = "$TESTNET";
+        data.network = "$NETWORK";
         data.nodeName = "$(hostname)";
         data.domainName = "$(hostname)";
         data.externalIPAddress = externalIPAddress;
@@ -223,7 +231,7 @@ elif [ "$MODE" = "blockproducer" ]; then
         fs.writeFileSync('./initialparams.json',JSON.stringify(data))
 EOF
     node index.js && 
-    cp ../ledgeriumnetwork/$TESTNET/* ./output/tmp &&
+    cp ../ledgeriumnetwork/$NETWORK/* ./output/tmp &&
     cd output &&
     docker-compose up -d
 else

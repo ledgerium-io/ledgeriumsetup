@@ -21,7 +21,7 @@ if [ -d "$DIRECTORY" ]; then
 
     git clone http://github.com/ledgerium-io/ledgeriumtools &&
     cd ledgeriumtools &&
-    git checkout bp
+    git checkout bp_update
 
     echo "+-----------------------------------------------------------------------+" 
     echo "|********************** Installing node modules ************************|" 

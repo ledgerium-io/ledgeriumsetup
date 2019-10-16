@@ -65,6 +65,7 @@ if [ $MODE = "0" ]; then
             //Manipulate data
             data.mode = "full";
             data.distributed = true;
+            data.network="flinders";
             data.nodeName = "$(hostname)";
             data.domainName = "$(hostname)";
             data.externalIPAddress = "$IP";

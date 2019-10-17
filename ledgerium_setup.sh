@@ -34,12 +34,85 @@ echo "|***************** Running ledgerium tools application *****************|"
 echo "+----------------------------------------------------------------------+"
 
 # Enter the type of node setup
-echo "Select the type of node setup - full/blockproducer ('0' for 'full' and '1' for 'blockproducer')"
+echo "Select the type of node setup - full/blockproducer ('0' for 'blockproducer' and '1' for 'full')"
 read -p 'MODE:' MODE
 
 IP=$(curl -s https://api.ipify.org)
 
 if [ $MODE = "0" ]; then
+    echo "+--------------------------------------------------------------------+"
+    echo "|***************** Executing script for blockproducer mode ****************|"
+
+    # Enter the folder name to pick network files
+    echo "Enter the testnet - toorak/flinders ('0' for 'toorak' and '1' for 'flinders')"
+    read -p 'TESTNET:' TESTNET
+
+    FLAG=false;
+    NETWORK="TOORAK"
+    if [ $TESTNET = "0" ]; then 
+        FLAG=false
+        NETWORK="toorak"
+    else
+        FLAG=true
+        NETWORK="flinders"
+    fi
+
+    cd ../
+    LED_NETWORK="$PWD/ledgeriumnetwork"
+
+    if [ -d "$LED_NETWORK" ]; then 
+
+        echo "|******************** Ledgerium network exists **********************|"
+        echo "|************ Pulling Ledgerium network from github *****************|"
+        echo "+--------------------------------------------------------------------+"
+
+        cd ledgeriumnetwork &&
+        git stash &&
+        git pull -f https://github.com/ledgerium-io/ledgeriumnetwork master &&
+        cd ../
+
+    else
+
+        echro "|**************** Ledgerium network deosn't exist *******************|"
+        echo "|************ Cloning Ledgerium network from github *****************|"
+        echo "+--------------------------------------------------------------------+"
+
+        git clone https://github.com/ledgerium-io/ledgeriumnetwork
+
+    fi
+
+    cd ledgeriumtools &&
+    mkdir -p output/tmp &&
+    echo "$PWD"
+
+    node <<EOF
+        //Read data
+        var data = require('./initialparams.json');
+        var fs = require('fs');
+
+        var staticNodes = require('../ledgeriumnetwork/$NETWORK/static-nodes.json');
+        var genesisInfo = require('../ledgeriumnetwork/$NETWORK/genesis.json');
+        var enode = staticNodes[0];
+        var externalIPAddress = (enode.split('@')[1]).split(':')[0];
+        var networkId = genesisInfo.config.chainId;
+
+        //Manipulate data
+        data.mode = "blockproducer";
+        data.distributed = $FLAG;
+        data.network = "$NETWORK";
+        data.nodeName = "$(hostname)";
+        data.domainName = "$(hostname)";
+        data.externalIPAddress = externalIPAddress;
+        data.networkId = networkId;
+
+        //Output data
+        fs.writeFileSync('./initialparams.json',JSON.stringify(data))
+EOF
+    node index.js && 
+    cp ../ledgeriumnetwork/$NETWORK/* ./output/tmp &&
+    cd output &&
+    docker-compose up -d
+elif [ $MODE = "1" ]; then
 
     # Enter the type of node setup
     echo "Is this a local setup or distributed? ('yes' for local and 'no' for distributed)"
@@ -155,79 +228,6 @@ EOF
         cd output &&
         docker-compose up -d
     fi
-elif [ $MODE = "1" ]; then
-    echo "+--------------------------------------------------------------------+"
-    echo "|***************** Executing script for blockproducer mode ****************|"
-
-    # Enter the folder name to pick network files
-    echo "Enter the testnet - toorak/flinders ('0' for 'toorak' and '1' for 'flinders')"
-    read -p 'TESTNET:' TESTNET
-
-    FLAG=false;
-    NETWORK="TOORAK"
-    if [ $TESTNET = "0" ]; then 
-        FLAG=false
-        NETWORK="toorak"
-    else
-        FLAG=true
-        NETWORK="flinders"
-    fi
-
-    cd ../
-    LED_NETWORK="$PWD/ledgeriumnetwork"
-
-    if [ -d "$LED_NETWORK" ]; then 
-
-        echo "|******************** Ledgerium network exists **********************|"
-        echo "|************ Pulling Ledgerium network from github *****************|"
-        echo "+--------------------------------------------------------------------+"
-
-        cd ledgeriumnetwork &&
-        git stash &&
-        git pull -f https://github.com/ledgerium-io/ledgeriumnetwork master &&
-        cd ../
-
-    else
-
-        echro "|**************** Ledgerium network deosn't exist *******************|"
-        echo "|************ Cloning Ledgerium network from github *****************|"
-        echo "+--------------------------------------------------------------------+"
-
-        git clone https://github.com/ledgerium-io/ledgeriumnetwork
-
-    fi
-
-    cd ledgeriumtools &&
-    mkdir -p output/tmp &&
-    echo "$PWD"
-
-    node <<EOF
-        //Read data
-        var data = require('./initialparams.json');
-        var fs = require('fs');
-
-        var staticNodes = require('../ledgeriumnetwork/$NETWORK/static-nodes.json');
-        var genesisInfo = require('../ledgeriumnetwork/$NETWORK/genesis.json');
-        var enode = staticNodes[0];
-        var externalIPAddress = (enode.split('@')[1]).split(':')[0];
-        var networkId = genesisInfo.config.chainId;
-
-        //Manipulate data
-        data.mode = "blockproducer";
-        data.distributed = $FLAG;
-        data.network = "$NETWORK";
-        data.nodeName = "$(hostname)";
-        data.domainName = "$(hostname)";
-        data.externalIPAddress = externalIPAddress;
-        data.networkId = networkId;
-
-        //Output data
-        fs.writeFileSync('./initialparams.json',JSON.stringify(data))
-EOF
-    node index.js && 
-    cp ../ledgeriumnetwork/$NETWORK/* ./output/tmp &&
-    cd output &&
-    docker-compose up -d
 else
         echo "Invalid mode :: $MODE"
 fi

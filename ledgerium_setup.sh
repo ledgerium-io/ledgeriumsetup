@@ -20,7 +20,7 @@ if [ -d "$DIRECTORY" ]; then
     echo "+-----------------------------------------------------------------------+"
 
     git clone http://github.com/ledgerium-io/ledgeriumtools &&
-    cd ledgeriumtools 
+    cd ledgeriumtools
 
     echo "+-----------------------------------------------------------------------+" 
     echo "|********************** Installing node modules ************************|" 
@@ -34,18 +34,91 @@ echo "|***************** Running ledgerium tools application *****************|"
 echo "+----------------------------------------------------------------------+"
 
 # Enter the type of node setup
-echo "Enter the type of node setup - full/masternode"
+echo "Select the type of node setup - full/blockproducer ('0' for 'blockproducer' and '1' for 'full')"
 read -p 'MODE:' MODE
 
 IP=$(curl -s https://api.ipify.org)
 
-if [ "$MODE" = "full" ]; then
+if [ $MODE = "0" ]; then
+    echo "+--------------------------------------------------------------------+"
+    echo "|***************** Executing script for blockproducer mode ****************|"
+
+    # Enter the folder name to pick network files
+    echo "Enter the testnet - toorak/flinders ('0' for 'toorak' and '1' for 'flinders')"
+    read -p 'TESTNET:' TESTNET
+
+    FLAG=false;
+    NETWORK="TOORAK"
+    if [ $TESTNET = "0" ]; then 
+        FLAG=false
+        NETWORK="toorak"
+    else
+        FLAG=true
+        NETWORK="flinders"
+    fi
+
+    cd ../
+    LED_NETWORK="$PWD/ledgeriumnetwork"
+
+    if [ -d "$LED_NETWORK" ]; then 
+
+        echo "|******************** Ledgerium network exists **********************|"
+        echo "|************ Pulling Ledgerium network from github *****************|"
+        echo "+--------------------------------------------------------------------+"
+
+        cd ledgeriumnetwork &&
+        git stash &&
+        git pull -f https://github.com/ledgerium-io/ledgeriumnetwork master &&
+        cd ../
+
+    else
+
+        echro "|**************** Ledgerium network deosn't exist *******************|"
+        echo "|************ Cloning Ledgerium network from github *****************|"
+        echo "+--------------------------------------------------------------------+"
+
+        git clone https://github.com/ledgerium-io/ledgeriumnetwork
+
+    fi
+
+    cd ledgeriumtools &&
+    mkdir -p output/tmp &&
+    echo "$PWD"
+
+    node <<EOF
+        //Read data
+        var data = require('./initialparams.json');
+        var fs = require('fs');
+
+        var staticNodes = require('../ledgeriumnetwork/$NETWORK/static-nodes.json');
+        var genesisInfo = require('../ledgeriumnetwork/$NETWORK/genesis.json');
+        var enode = staticNodes[0];
+        var externalIPAddress = (enode.split('@')[1]).split(':')[0];
+        var networkId = genesisInfo.config.chainId;
+
+        //Manipulate data
+        data.mode = "blockproducer";
+        data.distributed = $FLAG;
+        data.network = "$NETWORK";
+        data.nodeName = "$(hostname)";
+        data.domainName = "$(hostname)";
+        data.externalIPAddress = externalIPAddress;
+        data.networkId = networkId;
+
+        //Output data
+        fs.writeFileSync('./initialparams.json',JSON.stringify(data))
+EOF
+    node index.js && 
+    cp ../ledgeriumnetwork/$NETWORK/* ./output/tmp &&
+    cd output &&
+    docker-compose up -d
+elif [ $MODE = "1" ]; then
 
     # Enter the type of node setup
-    echo "Is this distributed setup - true/false"
-    read -p 'DISTRIBUTED:' DISTRIBUTED
+    echo "Is this a local setup or distributed? ('yes' for local and 'no' for distributed)"
+    read -p 'Setup:' SETUP
 
-    if [ "$DISTRIBUTED" = "true" ]; then
+    if [ "$SETUP" = "no" ]; then
 
         echo "|***************** Executing script for distributed full mode ****************|"
         
@@ -61,7 +134,8 @@ if [ "$MODE" = "full" ]; then
 
             //Manipulate data
             data.mode = "full";
-            data.distributed = $DISTRIBUTED;
+            data.distributed = true;
+            data.network="flinders";
             data.nodeName = "$(hostname)";
             data.domainName = "$(hostname)";
             data.externalIPAddress = "$IP";
@@ -98,37 +172,34 @@ EOF
                 echo "Skip 0th element of array"
             elif [ $index = 1 ]; then 
                 echo "First node will be run in same host"
-                cp fullnode/"docker-compose_$((index-1))_$B.yml" docker-compose.yml
+                cp fullnode/"docker-compose_$((index-1)).yml" docker-compose.yml
                 docker-compose up -d
             else
                 FOLDER=node_$((index-1))                                                        &&
                 mkdir -p $FOLDER/tmp                                                            &&
-                cp .env $FOLDER                                                                 &&
-                cp fullnode/"docker-compose_$((index-1))_$B.yml" $FOLDER/docker-compose.yml     &&
-                cp tmp/genesis.json $FOLDER/tmp                                                 &&
-                cp tmp/nodesdetails.json $FOLDER/tmp                                            &&
-                cp tmp/privatekeys.json $FOLDER/tmp                                             &&
-                cp tmp/static-nodes.json $FOLDER/tmp                                            &&
+                cp fullnode/".env$((index-1))" $FOLDER/.env                                                                 &&
+                cp fullnode/"docker-compose_$((index-1)).yml" $FOLDER/docker-compose.yml     &&
+                cp fullnode/tmp/"privatekeys$((index-1)).json" $FOLDER/tmp/privatekeys.json  &&
+                cp tmp/nodesdetails.json tmp/genesis.json tmp/static-nodes.json $FOLDER/tmp                                            &&
                 echo "*** Enter username for $B ***"                                            &&
                 read -p 'Username:' username                                                    &&
                 echo "*** Enter password to create folder structure ***"                        &&
                 ssh $username@$B "cd ~/ledgerium/ && mkdir -p ledgeriumtools/output/tmp"        &&
                 echo "*** Enter password to start copying files ***"                            &&
-                scp -r $FOLDER/* $username@$B:~/ledgerium/ledgeriumtools/output                 &&
-                echo "*** Enter password to copy .env ***"                                      &&
-                scp -r $FOLDER/.env $username@$B:~/ledgerium/ledgeriumtools/output              &&
-                echo "*** Enter password to start bring up docker containers ***"               &&  
+                scp -r $FOLDER/* $FOLDER/.env $username@$B:~/ledgerium/ledgeriumtools/output                 &&
+                echo "*** Enter password to start bring up docker containers ***"                 
                 ssh $username@$B "cd ~/ledgerium/ledgeriumtools/output && docker-compose up -d" 
             fi
         done
-    else
+        echo "*** Removing files from fullnode ***"
+        sudo rm -rf fullnode node_*
+    elif [ "$SETUP" = "yes" ]; then
         echo "|***************** Executing script for local full mode ****************|"
         # Enter Network ID
         echo "Enter Network ID"
         read -p 'Network ID:' NETWORKID
         
         echo "+--------------------------------------------------------------------+"
-        echo "|***************** Executing script for '$MODE' mode ****************|"
 
         node <<EOF
 
@@ -137,8 +208,9 @@ EOF
         var fs = require('fs');
 
         //Manipulate data
-        data.mode = "$MODE";
+        data.mode = "full";
         data.distributed = false;
+        data.network="toorak";
         data.nodeName = "$(hostname)";
         data.domainName = "$(hostname)";
         data.externalIPAddress = "$IP";
@@ -156,63 +228,6 @@ EOF
         cd output &&
         docker-compose up -d
     fi
-elif [ "$MODE" = "masternode" ]; then
-    echo "+--------------------------------------------------------------------+"
-    echo "|***************** Executing script for '$MODE' mode ****************|"
-
-    cd ../
-    LED_NETWORK="$PWD/ledgeriumnetwork"
-
-    if [ -d "$LED_NETWORK" ]; then 
-
-        echo "|******************** Ledgerium network exists **********************|"
-        echo "|************ Pulling Ledgerium network from github *****************|"
-        echo "+--------------------------------------------------------------------+"
-
-        cd ledgeriumnetwork &&
-        # git stash &&
-        # git pull -f https://github.com/ledgerium-io/ledgeriumnetwork master &&
-        cd ../
-
-    else
-
-        echo "|**************** Ledgerium network deosn't exist *******************|"
-        echo "|************ Cloning Ledgerium network from github *****************|"
-        echo "+--------------------------------------------------------------------+"
-
-        git clone https://github.com/ledgerium-io/ledgeriumnetwork
-
-    fi
-
-    cd ledgeriumtools &&
-    mkdir -p output/tmp &&
-    echo "$PWD"
-
-    node <<EOF
-        //Read data
-        var data = require('./initialparams.json');
-        var fs = require('fs');
-
-        var staticNodes = require('../ledgeriumnetwork/static-nodes.json');
-        var genesisInfo = require('../ledgeriumnetwork/genesis.json');
-        var enode = staticNodes[0];
-        var externalIPAddress = (enode.split('@')[1]).split(':')[0];
-        var networkId = genesisInfo.config.chainId;
-
-        //Manipulate data
-        data.mode = "$MODE";
-        data.distributed = false;
-        data.nodeName = "$(hostname)";
-        data.domainName = "$(hostname)";
-        data.externalIPAddress = externalIPAddress;
-        data.networkId = networkId;
-
-        //Output data
-        fs.writeFileSync('./initialparams.json',JSON.stringify(data))
-EOF
-    node index.js && cp ../ledgeriumnetwork/* ./output/tmp &&
-    cd output &&
-    docker-compose up -d
 else
         echo "Invalid mode :: $MODE"
 fi

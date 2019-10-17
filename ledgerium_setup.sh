@@ -34,9 +34,7 @@ echo "|***************** Running ledgerium tools application *****************|"
 echo "+----------------------------------------------------------------------+"
 
 # Enter the type of node setup
-echo "Select the type of node setup - 0/1"
-echo "0 - full"
-echo "1 - blockproducer"
+echo "Select the type of node setup - full/blockproducer ('0' for 'full' and '1' for 'blockproducer')"
 read -p 'MODE:' MODE
 
 IP=$(curl -s https://api.ipify.org)
@@ -44,10 +42,10 @@ IP=$(curl -s https://api.ipify.org)
 if [ $MODE = "0" ]; then
 
     # Enter the type of node setup
-    echo "Is this distributed setup - yes/no"
-    read -p 'DISTRIBUTED:' DISTRIBUTED
+    echo "Is this a local setup or distributed? ('yes' for local and 'no' for distributed)"
+    read -p 'Setup:' SETUP
 
-    if [ "$DISTRIBUTED" = "yes" ]; then
+    if [ "$SETUP" = "no" ]; then
 
         echo "|***************** Executing script for distributed full mode ****************|"
         
@@ -122,7 +120,7 @@ EOF
         done
         echo "*** Removing files from fullnode ***"
         sudo rm -rf fullnode node_*
-    else
+    elif [ "$SETUP" = "yes" ]; then
         echo "|***************** Executing script for local full mode ****************|"
         # Enter Network ID
         echo "Enter Network ID"
@@ -162,9 +160,7 @@ elif [ $MODE = "1" ]; then
     echo "|***************** Executing script for blockproducer mode ****************|"
 
     # Enter the folder name to pick network files
-    echo "Enter the testnet - 0/1"
-    echo "0 - toorak"
-    echo "1 - flinders"
+    echo "Enter the testnet - toorak/flinders ('0' for 'toorak' and '1' for 'flinders')"
     read -p 'TESTNET:' TESTNET
 
     FLAG=false;

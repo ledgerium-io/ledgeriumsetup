@@ -99,6 +99,7 @@ if [ $MODE = "0" ]; then
         //Manipulate data
         data.mode = "blockproducer";
         data.distributed = $FLAG;
+        data.env = "devnet";
         data.network = "$NETWORK";
         data.nodeName = "$(hostname)";
         data.domainName = "$(hostname)";
@@ -135,6 +136,7 @@ elif [ $MODE = "1" ]; then
             //Manipulate data
             data.mode = "full";
             data.distributed = true;
+            data.env = "devnet";
             data.network="flinders";
             data.nodeName = "$(hostname)";
             data.domainName = "$(hostname)";
@@ -210,6 +212,7 @@ EOF
         //Manipulate data
         data.mode = "full";
         data.distributed = false;
+        data.env = "devnet";
         data.network="toorak";
         data.nodeName = "$(hostname)";
         data.domainName = "$(hostname)";
@@ -227,6 +230,8 @@ EOF
         node index.js &&
         cd output &&
         docker-compose up -d
+    else 
+    echo "Invalid setup value :: $SETUP"
     fi
 else
         echo "Invalid mode :: $MODE"

@@ -124,8 +124,25 @@ elif [ $MODE = "1" ]; then
         echo "|***************** Executing script for distributed full mode ****************|"
         
         # Enter Network ID
+        ok=0
+        while [ $ok = 0 ]
+        do
         echo "Enter Network ID"
+        echo "Should be a 4 digit number. Ex: 2019"
         read -p 'Network ID:' NETWORKID
+        if [[ ! $NETWORKID =~ ^[0-9]{4} ]]
+        then
+            echo Only numbers and 4 digits
+        else
+            if [[ ${#NETWORKID} -eq 4 ]]
+                then
+                ok=1
+            else
+                echo Length should be 4
+            fi
+            echo $id
+        fi
+        done
         
         node <<EOF
 
@@ -198,8 +215,26 @@ EOF
     elif [ "$SETUP" = "yes" ]; then
         echo "|***************** Executing script for local full mode ****************|"
         # Enter Network ID
+                # Enter Network ID
+        ok=0
+        while [ $ok = 0 ]
+        do
         echo "Enter Network ID"
+        echo "Should be a 4 digit number. Ex: 2019"
         read -p 'Network ID:' NETWORKID
+        if [[ ! $NETWORKID =~ ^[0-9]{4} ]]
+        then
+            echo Only numbers and 4 digits
+        else
+            if [[ ${#NETWORKID} -eq 4 ]]
+                then
+                ok=1
+            else
+                echo Length should be 4
+            fi
+            echo $id
+        fi
+        done
         
         echo "+--------------------------------------------------------------------+"
 
@@ -212,7 +247,7 @@ EOF
         //Manipulate data
         data.mode = "full";
         data.distributed = false;
-        data.env = "devnet";
+        data.env = "testnet";
         data.network="toorak";
         data.nodeName = "$(hostname)";
         data.domainName = "$(hostname)";

@@ -1,10 +1,16 @@
 #!/bin/bash
 
-if [ -z "$1" ]
-  then
-    echo "Backup folder is not supplied"
-    exit 1
-fi
+# if [ -z "$1" ]
+#   then
+#     echo "Backup folder is not supplied"
+#     exit 1
+# fi
+
+# Timestamp function
+timestamp() {
+  date +"%Y_%m_%d_%H_%M_%S"
+}
+DIR="ledgeriumtools_$(timestamp)"
 
 if [[ "$OSTYPE" == "linux-gnu" ]]; then
     
@@ -17,29 +23,39 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
     [[ $DIST == *"centos"* ]]; then
         echo "OS: $DIST"
 
-        cd ../ledgeriumtools/output || exit
+        cd ..
+        if [ ! -d ledgeriumtools ]; then
+          echo "Ledgerium tools doesnot exist, nothing to clean up"
+          exit
+        fi
+
+        cd ledgeriumtools || exit
         echo "Current folder - $PWD"
+        
+        if [ ! -d $PWD/output ]; then
+          echo "output directory doesnot exist"
+          echo "Moving ledgeriumtools to $DIR"
+          cd ..
+          mv ledgeriumtools $DIR
+        else
+          echo "Output directory exists, checking for YML file"
+          cd output
 
-        # Timestamp function
-        timestamp() {
-          date +"%Y_%m_%d_%H_%M_%S"
-        }
+          if [ ! -f "docker-compose.yml" ]; then 
+            echo "YML file doesnot exist"
+            echo "Moving ledgeriumtools to $DIR"
+            cd ../..
+            mv ledgeriumtools $DIR
+          else
+            echo "YML file exists"
 
-        DIR=$1
-        echo "Backup folder $DIR"
+            echo 'Stopping all containers'
+            docker-compose down
 
-        echo 'Stopping all containers'
-        docker-compose down
-
-        echo 'Moving datastore files'
-        folder=output_"$(timestamp)"
-        mkdir -p "$DIR"/"$folder"
-        sudo mv -f tessera-* "$DIR"/"$folder"
-        sudo mv -f validator-* "$DIR"/"$folder"
-
-        echo 'Starting all containers'
-        docker-compose up -d
-    
+            cd ../..
+            mv ledgeriumtools $DIR
+          fi
+        fi
     else
         echo "Unknown linux distribution"
     fi
@@ -48,29 +64,38 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
         # Mac OSX
         echo "OS: $OSTYPE"
 
-        cd ../ledgeriumtools/output || exit
+        cd ..
+        if [ ! -d ledgeriumtools ]; then
+          echo "Ledgerium tools doesnot exist, nothing to clean up"
+          exit
+        fi
+        cd ledgeriumtools || exit
         echo "Current folder - $PWD"
+        
+        if [ ! -d $PWD/output ]; then
+          echo "output directory doesnot exist"
+          echo "Moving ledgeriumtools to $DIR"
+          cd ..
+          mv ledgeriumtools $DIR
+        else
+          echo "Output directory exists, checking for YML file"
+          cd output
 
-        # Timestamp function
-        timestamp() {
-          date +"%Y_%m_%d_%H_%M_%S"
-        }
+          if [ ! -f "docker-compose.yml" ]; then 
+            echo "YML file doesnot exist"
+            echo "Moving ledgeriumtools to $DIR"
+            cd ../..
+            mv ledgeriumtools $DIR
+          else
+            echo "YML file exists"
 
-        DIR=$1
-        echo "Backup folder $DIR"
+            echo 'Stopping all containers'
+            docker-compose down
 
-        echo 'Stopping all containers'
-        docker-compose down
-
-        echo 'Moving datastore files'
-        folder=output_"$(timestamp)"
-        echo "$DIR"/"$folder"
-        mkdir -p "$DIR"/"$folder"
-        sudo mv -f validator-* "$DIR"/"$folder"
-        sudo mv -f tessera-* "$DIR"/"$folder"
-
-        echo 'Starting all containers'
-        docker-compose up -d
+            cd ../..
+            mv ledgeriumtools $DIR
+          fi
+        fi
         
 elif [[ "$OSTYPE" == "cygwin" ]]; then
         # POSIX compatibility layer and Linux environment emulation for Windows

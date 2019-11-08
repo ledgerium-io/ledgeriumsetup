@@ -1,4 +1,18 @@
 #!/bin/bash
+echo "Do you want to run cleanup script first?"
+echo "Choosing 'yes' will stop any running containers and takes backup of ledgeriumtools"
+read -p "(yes/no) : " CLEANUP
+
+if [ $CLEANUP == "yes" ]; then
+    read -p "Enter a name to be used for backup directory : " DIRNAME
+    echo "Running cleanup script"
+    ./ledgerium_cleanup.sh $DIRNAME
+elif [ $CLEANUP == "no" ]; then
+    echo "Running setup without cleanup"
+else
+    echo "Invalid input :: $CLEANUP"
+fi
+
 cd ../
 DIRECTORY="$PWD/ledgeriumtools"
 
@@ -49,7 +63,7 @@ if [ $MODE = "0" ]; then
 
     FLAG=false;
     NETWORK="TOORAK"
-    if [ $TESTNET = "0" ]; then 
+    if [ $TESTNET = "0" ]; then
         FLAG=false
         NETWORK="toorak"
     else
@@ -60,28 +74,18 @@ if [ $MODE = "0" ]; then
     cd ../
     LED_NETWORK="$PWD/ledgeriumnetwork"
 
-    if [ -d "$LED_NETWORK" ]; then 
-
-        echo "|******************** Ledgerium network exists **********************|"
-        echo "|************ Pulling Ledgerium network from github *****************|"
-        echo "+--------------------------------------------------------------------+"
-
-        cd ledgeriumnetwork &&
-        git stash &&
-        git pull -f https://github.com/ledgerium-io/ledgeriumnetwork master &&
-        cd ../
-
+    if [ -d "$LED_NETWORK" ]; then
+        cd ledgeriumnetwork 
+        curl -LJO https://github.com/ledgerium-io/ledgeriumnetwork/blob/master/$NETWORK/genesis.json
+        curl -LJO https://github.com/ledgerium-io/ledgeriumnetwork/blob/master/$NETWORK/static-nodes.json
     else
-
-        echro "|**************** Ledgerium network deosn't exist *******************|"
-        echo "|************ Cloning Ledgerium network from github *****************|"
-        echo "+--------------------------------------------------------------------+"
-
-        git clone https://github.com/ledgerium-io/ledgeriumnetwork
-
+        mkdir ledgeriumnetwork
+        cd ledgeriumnetwork
+        curl -LJO https://github.com/ledgerium-io/ledgeriumnetwork/blob/master/$NETWORK/genesis.json
+        curl -LJO https://github.com/ledgerium-io/ledgeriumnetwork/blob/master/$NETWORK/static-nodes.json
     fi
 
-    cd ledgeriumtools &&
+    cd ../ledgeriumtools &&
     mkdir -p output/tmp &&
     echo "$PWD"
 
@@ -90,8 +94,8 @@ if [ $MODE = "0" ]; then
         var data = require('./initialparams.json');
         var fs = require('fs');
 
-        var staticNodes = require('../ledgeriumnetwork/$NETWORK/static-nodes.json');
-        var genesisInfo = require('../ledgeriumnetwork/$NETWORK/genesis.json');
+        var staticNodes = require('../ledgeriumnetwork/static-nodes.json');
+        var genesisInfo = require('../ledgeriumnetwork/genesis.json');
         var enode = staticNodes[0];
         var externalIPAddress = (enode.split('@')[1]).split(':')[0];
         var networkId = genesisInfo.config.chainId;
@@ -110,16 +114,16 @@ if [ $MODE = "0" ]; then
         fs.writeFileSync('./initialparams.json',JSON.stringify(data))
 EOF
     node index.js && 
-    cp ../ledgeriumnetwork/$NETWORK/* ./output/tmp &&
+    cp ../ledgeriumnetwork/* ./output/tmp &&
     cd output &&
     docker-compose up -d
 elif [ $MODE = "1" ]; then
 
     # Enter the type of node setup
-    echo "Is this a local setup or distributed? ('yes' for local and 'no' for distributed)"
+    echo "Is this a local setup or distributed? ('0' for local and '1' for distributed)"
     read -p 'Setup:' SETUP
 
-    if [ "$SETUP" = "no" ]; then
+    if [ $SETUP = "1" ]; then
 
         echo "|***************** Executing script for distributed full mode ****************|"
         
@@ -212,7 +216,7 @@ EOF
         done
         echo "*** Removing files from fullnode ***"
         sudo rm -rf fullnode node_*
-    elif [ "$SETUP" = "yes" ]; then
+    elif [ $SETUP = "0" ]; then
         echo "|***************** Executing script for local full mode ****************|"
         # Enter Network ID
                 # Enter Network ID

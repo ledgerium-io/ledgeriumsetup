@@ -49,7 +49,7 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
           else
             echo "YML file exists"
 
-            echo 'Stopping all containers'
+            echo "Stopping all containers and moving ledgeriumtools to $DIR"
             docker-compose down
 
             cd ../..

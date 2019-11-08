@@ -4,9 +4,8 @@ echo "Choosing 'yes' will stop any running containers and takes backup of ledger
 read -p "(yes/no) : " CLEANUP
 
 if [ $CLEANUP == "yes" ]; then
-    read -p "Enter a name to be used for backup directory : " DIRNAME
     echo "Running cleanup script"
-    ./ledgerium_cleanup.sh $DIRNAME
+    ./ledgerium_cleanup.sh
 elif [ $CLEANUP == "no" ]; then
     echo "Running setup without cleanup"
 else

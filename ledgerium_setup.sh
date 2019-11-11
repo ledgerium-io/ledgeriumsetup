@@ -75,13 +75,13 @@ if [ $MODE = "0" ]; then
 
     if [ -d "$LED_NETWORK" ]; then
         cd ledgeriumnetwork 
-        curl -LJO https://github.com/ledgerium-io/ledgeriumnetwork/blob/master/$NETWORK/genesis.json
-        curl -LJO https://github.com/ledgerium-io/ledgeriumnetwork/blob/master/$NETWORK/static-nodes.json
+        curl -LJO https://raw.githubusercontent.com/ledgerium-io/ledgeriumnetwork/master/$NETWORK/genesis.json
+        curl -LJO https://raw.githubusercontent.com/ledgerium-io/ledgeriumnetwork/master/$NETWORK/static-nodes.json
     else
         mkdir ledgeriumnetwork
         cd ledgeriumnetwork
-        curl -LJO https://github.com/ledgerium-io/ledgeriumnetwork/blob/master/$NETWORK/genesis.json
-        curl -LJO https://github.com/ledgerium-io/ledgeriumnetwork/blob/master/$NETWORK/static-nodes.json
+        curl -LJO https://raw.githubusercontent.com/ledgerium-io/ledgeriumnetwork/master/$NETWORK/genesis.json
+        curl -LJO https://raw.githubusercontent.com/ledgerium-io/ledgeriumnetwork/master/$NETWORK/static-nodes.json
     fi
 
     cd ../ledgeriumtools &&

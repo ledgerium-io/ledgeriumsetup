@@ -25,7 +25,7 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
 
         cd ..
         if [ ! -d ledgeriumtools ]; then
-          echo "Ledgerium tools doesnot exist, nothing to clean up"
+          echo "ledgerium ools doesnot exist, nothing to clean up"
           exit
         fi
 
@@ -33,27 +33,20 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
         echo "Current folder - $PWD"
         
         if [ ! -d $PWD/output ]; then
-          echo "output directory doesnot exist"
-          echo "Moving ledgeriumtools to $DIR"
+          echo "ledgeriumtools backed up with $DIR"
           cd ..
           mv ledgeriumtools $DIR
         else
-          echo "Output directory exists, checking for YML file"
           cd output
-
           if [ ! -f "docker-compose.yml" ]; then 
-            echo "YML file doesnot exist"
-            echo "Moving ledgeriumtools to $DIR"
             cd ../..
             mv ledgeriumtools $DIR
+            echo "No running containers found, ledgeriumtools folder is backed up with $DIR"
           else
-            echo "YML file exists"
-
-            echo "Stopping all containers and moving ledgeriumtools to $DIR"
             docker-compose down
-
             cd ../..
             mv ledgeriumtools $DIR
+            echo "Existing containers are stopped and the existing ledgeriumtools folder is backed up with $DIR"
           fi
         fi
     else
@@ -66,34 +59,26 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
 
         cd ..
         if [ ! -d ledgeriumtools ]; then
-          echo "Ledgerium tools doesnot exist, nothing to clean up"
+          echo "ledgeriumtools doesnot exist, nothing to clean up"
           exit
         fi
         cd ledgeriumtools || exit
-        echo "Current folder - $PWD"
         
         if [ ! -d $PWD/output ]; then
-          echo "output directory doesnot exist"
-          echo "Moving ledgeriumtools to $DIR"
           cd ..
           mv ledgeriumtools $DIR
+          echo "ledgeriumtools backed up with $DIR"
         else
-          echo "Output directory exists, checking for YML file"
           cd output
-
           if [ ! -f "docker-compose.yml" ]; then 
-            echo "YML file doesnot exist"
-            echo "Moving ledgeriumtools to $DIR"
+            echo "No running containers found, ledgeriumtools folder is backed up with $DIR"
             cd ../..
             mv ledgeriumtools $DIR
           else
-            echo "YML file exists"
-
-            echo 'Stopping all containers'
             docker-compose down
-
             cd ../..
             mv ledgeriumtools $DIR
+            echo "Existing containers are stopped and the existing ledgeriumtools folder is backed up with $DIR"
           fi
         fi
         

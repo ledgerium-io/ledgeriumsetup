@@ -1,12 +1,12 @@
 #!/bin/bash
-echo "Do you want to run cleanup script first?"
-echo "Choosing 'yes' will stop any running containers and takes backup of ledgeriumtools"
+echo "There seems to be an existing setup already. Warning: This will a hard reset. You may end up losing ledgerium accounts on your node and other data and additionally, it might take a while before the new node synch up with Ledgerium Blockchain fully. The new node may not be able to write transactions during this period. Do you really want to clean up? "
 read -p "(yes/no) : " CLEANUP
 
-if [ $CLEANUP == "yes" ]; then
+if [[ $CLEANUP == "yes" ]] || [[ $CLEANUP == "y" ]]; then
     echo "Running cleanup script"
     ./ledgerium_cleanup.sh
-elif [ $CLEANUP == "no" ]; then
+    echo "Cleanup is done and now, actual setup is starting"
+elif [[ $CLEANUP == "no" ]] || [[ $CLEANUP == "n" ]]; then
     echo "Running setup without cleanup"
 else
     echo "Invalid input :: $CLEANUP"
@@ -66,9 +66,12 @@ if [ $MODE = "0" ]; then
     if [ $TESTNET = "0" ]; then
         FLAG=false
         NETWORK="toorak"
-    else
+    elif [ $TESTNET = "1" ]; then
         FLAG=true
         NETWORK="flinders"
+    else 
+        echo "Invalid input :: $TESTNET"
+        exit
     fi
 
     cd ../
@@ -86,7 +89,6 @@ if [ $MODE = "0" ]; then
 
     cd ../ledgeriumtools &&
     mkdir -p output/tmp &&
-    echo "$PWD"
 
     node <<EOF
         //Read data
@@ -113,9 +115,16 @@ if [ $MODE = "0" ]; then
         fs.writeFileSync('./initialparams.json',JSON.stringify(data))
 EOF
     node index.js && 
-    cp ../ledgeriumnetwork/* ./output/tmp &&
+    cp ../ledgeriumnetwork/genesis.json ../ledgeriumnetwork/static-nodes.json ./output/tmp &&
     cd output &&
     docker-compose up -d
+
+    echo "Summary"
+    echo "  - Existing containers are stopped and the existing ledgeriumtools folder is backed up"
+    echo "  - New ledgeriumtools repository is created." 
+    echo "  - LedgeriumNetwork folder contains files 'genesis.json' and 'static-nodes.json' files. To know more abou these files, please refer https://docs.ledgerium.io"
+    echo "  - New peer node is setup and added to toorak/flinders. One can check the status of the new node on https://$NETWORK.ledgerium.io/ "
+
 elif [ $MODE = "1" ]; then
 
     # Enter the type of node setup
@@ -274,3 +283,5 @@ EOF
 else
         echo "Invalid mode :: $MODE"
 fi
+printf -- '\n';
+exit 0;

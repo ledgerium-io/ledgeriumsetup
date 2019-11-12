@@ -259,7 +259,7 @@ EOF
         //Manipulate data
         data.mode = "full";
         data.distributed = false;
-        data.env = "testnet";
+        data.env = "devnet";
         data.network="toorak";
         data.nodeName = "$(hostname)";
         data.domainName = "$(hostname)";

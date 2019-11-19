@@ -32,7 +32,7 @@ if [ -d "$DIRECTORY" ]; then
     echo "|***************** Cloning ledgerium tools from github *****************|"
     echo "+-----------------------------------------------------------------------+"
 
-    git clone http://github.com/ledgerium-io/ledgeriumtools &&
+    git clone --single-branch --branch feat/fullnodesetup http://github.com/ledgerium-io/ledgeriumtools &&
     cd ledgeriumtools &&
     git checkout feat/fullnodesetup
 

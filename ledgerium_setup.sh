@@ -283,5 +283,19 @@ EOF
 else
         echo "Invalid mode :: $MODE"
 fi
+
+echo "Ledgerium Blockchain setup is complete now!"
+echo "Ledgerium Blockchain setup is done on $DIRECTORY. Do you want to switch to that directory?"
+read -p "(yes/no) : " TOOLDIRECTMOVE
+
+if [[ $TOOLDIRECTMOVE == "yes" ]] || [[ $TOOLDIRECTMOVE == "y" ]]; then
+    echo "Moving to Ledgerium Blockchain setup directory"
+    cd $DIRECTORY/output
+elif [[ $TOOLDIRECTMOVE == "no" ]] || [[ $TOOLDIRECTMOVE == "n" ]]; then
+    echo "Exiting."
+else
+    echo "Invalid input :: $TOOLDIRECTMOVE"
+fi
+
 printf -- '\n';
 exit 0;

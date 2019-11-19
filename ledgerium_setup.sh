@@ -1,4 +1,17 @@
 #!/bin/bash
+echo "There seems to be an existing setup already. Warning: This will a hard reset. You may end up losing ledgerium accounts on your node and other data and additionally, it might take a while before the new node synch up with Ledgerium Blockchain fully. The new node may not be able to write transactions during this period. Do you really want to clean up? "
+read -p "(yes/no) : " CLEANUP
+
+if [[ $CLEANUP == "yes" ]] || [[ $CLEANUP == "y" ]]; then
+    echo "Running cleanup script"
+    ./ledgerium_cleanup.sh
+    echo "Cleanup is done and now, actual setup is starting"
+elif [[ $CLEANUP == "no" ]] || [[ $CLEANUP == "n" ]]; then
+    echo "Running setup without cleanup"
+else
+    echo "Invalid input :: $CLEANUP"
+fi
+
 cd ../
 DIRECTORY="$PWD/ledgeriumtools"
 
@@ -19,7 +32,7 @@ if [ -d "$DIRECTORY" ]; then
     echo "|***************** Cloning ledgerium tools from github *****************|"
     echo "+-----------------------------------------------------------------------+"
 
-    git clone http://github.com/ledgerium-io/ledgeriumtools &&
+    git clone --single-branch --branch master http://github.com/ledgerium-io/ledgeriumtools &&
     cd ledgeriumtools
 
     echo "+-----------------------------------------------------------------------+" 
@@ -49,49 +62,40 @@ if [ $MODE = "0" ]; then
 
     FLAG=false;
     NETWORK="TOORAK"
-    if [ $TESTNET = "0" ]; then 
+    if [ $TESTNET = "0" ]; then
         FLAG=false
         NETWORK="toorak"
-    else
+    elif [ $TESTNET = "1" ]; then
         FLAG=true
         NETWORK="flinders"
+    else 
+        echo "Invalid input :: $TESTNET"
+        exit
     fi
 
     cd ../
     LED_NETWORK="$PWD/ledgeriumnetwork"
 
-    if [ -d "$LED_NETWORK" ]; then 
-
-        echo "|******************** Ledgerium network exists **********************|"
-        echo "|************ Pulling Ledgerium network from github *****************|"
-        echo "+--------------------------------------------------------------------+"
-
-        cd ledgeriumnetwork &&
-        git stash &&
-        git pull -f https://github.com/ledgerium-io/ledgeriumnetwork master &&
-        cd ../
-
+    if [ -d "$LED_NETWORK" ]; then
+        cd ledgeriumnetwork 
     else
-
-        echro "|**************** Ledgerium network deosn't exist *******************|"
-        echo "|************ Cloning Ledgerium network from github *****************|"
-        echo "+--------------------------------------------------------------------+"
-
-        git clone https://github.com/ledgerium-io/ledgeriumnetwork
-
+        mkdir ledgeriumnetwork
+        cd ledgeriumnetwork
     fi
+    
+    curl -LJO https://raw.githubusercontent.com/ledgerium-io/ledgeriumnetwork/master/$NETWORK/genesis.json
+    curl -LJO https://raw.githubusercontent.com/ledgerium-io/ledgeriumnetwork/master/$NETWORK/static-nodes.json
 
-    cd ledgeriumtools &&
+    cd ../ledgeriumtools &&
     mkdir -p output/tmp &&
-    echo "$PWD"
 
     node <<EOF
         //Read data
         var data = require('./initialparams.json');
         var fs = require('fs');
 
-        var staticNodes = require('../ledgeriumnetwork/$NETWORK/static-nodes.json');
-        var genesisInfo = require('../ledgeriumnetwork/$NETWORK/genesis.json');
+        var staticNodes = require('../ledgeriumnetwork/static-nodes.json');
+        var genesisInfo = require('../ledgeriumnetwork/genesis.json');
         var enode = staticNodes[0];
         var externalIPAddress = (enode.split('@')[1]).split(':')[0];
         var networkId = genesisInfo.config.chainId;
@@ -110,22 +114,47 @@ if [ $MODE = "0" ]; then
         fs.writeFileSync('./initialparams.json',JSON.stringify(data))
 EOF
     node index.js && 
-    cp ../ledgeriumnetwork/$NETWORK/* ./output/tmp &&
+    cp ../ledgeriumnetwork/genesis.json ../ledgeriumnetwork/static-nodes.json ./output/tmp &&
     cd output &&
     docker-compose up -d
+
+    echo "Summary:"
+    echo "  - Existing containers are stopped, and the current ledgeriumtools folder is backed up."
+    echo "  - New ledgeriumtools repository is created." 
+    echo "  - LedgeriumNetwork folder contains files 'genesis.json' and 'static-nodes.json' files. To know more about these files, please refer https://docs.ledgerium.io/docs/ledgerium-test-networks."
+    echo "  - New peer node is set up and added to $NETWORK testnet. You can check the status of the new node on https://$NETWORK.ledgerium.io/."
+    echo "  - If you want to join the block producer consortium and write transactions on the blockchain, please contact Ledgerium Foundation team."
+
 elif [ $MODE = "1" ]; then
 
     # Enter the type of node setup
-    echo "Is this a local setup or distributed? ('yes' for local and 'no' for distributed)"
+    echo "Is this a local setup or distributed? ('0' for local and '1' for distributed)"
     read -p 'Setup:' SETUP
 
-    if [ "$SETUP" = "no" ]; then
+    if [ $SETUP = "1" ]; then
 
         echo "|***************** Executing script for distributed full mode ****************|"
         
         # Enter Network ID
+        ok=0
+        while [ $ok = 0 ]
+        do
         echo "Enter Network ID"
+        echo "Should be a 4 digit number. Ex: 2019"
         read -p 'Network ID:' NETWORKID
+        if [[ ! $NETWORKID =~ ^[0-9]{4} ]]
+        then
+            echo Only numbers and 4 digits
+        else
+            if [[ ${#NETWORKID} -eq 4 ]]
+                then
+                ok=1
+            else
+                echo Length should be 4
+            fi
+            echo $id
+        fi
+        done
         
         node <<EOF
 
@@ -195,11 +224,29 @@ EOF
         done
         echo "*** Removing files from fullnode ***"
         sudo rm -rf fullnode node_*
-    elif [ "$SETUP" = "yes" ]; then
+    elif [ $SETUP = "0" ]; then
         echo "|***************** Executing script for local full mode ****************|"
         # Enter Network ID
+                # Enter Network ID
+        ok=0
+        while [ $ok = 0 ]
+        do
         echo "Enter Network ID"
+        echo "Should be a 4 digit number. Ex: 2019"
         read -p 'Network ID:' NETWORKID
+        if [[ ! $NETWORKID =~ ^[0-9]{4} ]]
+        then
+            echo Only numbers and 4 digits
+        else
+            if [[ ${#NETWORKID} -eq 4 ]]
+                then
+                ok=1
+            else
+                echo Length should be 4
+            fi
+            echo $id
+        fi
+        done
         
         echo "+--------------------------------------------------------------------+"
 
@@ -236,3 +283,8 @@ EOF
 else
         echo "Invalid mode :: $MODE"
 fi
+
+echo "Ledgerium Blockchain setup is complete now! The setup file is available in $DIRECTORY/output."
+
+printf -- '\n';
+exit 0;

@@ -32,9 +32,8 @@ if [ -d "$DIRECTORY" ]; then
     echo "|***************** Cloning ledgerium tools from github *****************|"
     echo "+-----------------------------------------------------------------------+"
 
-    git clone --single-branch --branch feat/fullnodesetup http://github.com/ledgerium-io/ledgeriumtools &&
-    cd ledgeriumtools &&
-    git checkout feat/fullnodesetup
+    git clone --single-branch --branch master http://github.com/ledgerium-io/ledgeriumtools &&
+    cd ledgeriumtools
 
     echo "+-----------------------------------------------------------------------+" 
     echo "|********************** Installing node modules ************************|" 

@@ -119,11 +119,11 @@ EOF
     cd output &&
     docker-compose up -d
 
-    echo "Summary"
-    echo "  - Existing containers are stopped and the existing ledgeriumtools folder is backed up"
+    echo "Summary:"
+    echo "  - Existing containers are stopped and the existing ledgeriumtools folder is backed up."
     echo "  - New ledgeriumtools repository is created." 
-    echo "  - LedgeriumNetwork folder contains files 'genesis.json' and 'static-nodes.json' files. To know more abou these files, please refer https://docs.ledgerium.io"
-    echo "  - New peer node is setup and added to toorak/flinders. One can check the status of the new node on https://$NETWORK.ledgerium.io/ "
+    echo "  - LedgeriumNetwork folder contains files 'genesis.json' and 'static-nodes.json' files. To know more about these files, please refer https://docs.ledgerium.io/docs/ledgerium-test-networks"
+    echo "  - New peer node is setup and added to $NETWORK. You can check the status of the new node on https://$NETWORK.ledgerium.io/ "
 
 elif [ $MODE = "1" ]; then
 

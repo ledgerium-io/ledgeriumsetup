@@ -284,8 +284,7 @@ else
         echo "Invalid mode :: $MODE"
 fi
 
-echo "Ledgerium Blockchain setup is complete now!"
-echo "Ledgerium Blockchain setup is done on $DIRECTORY. Setup file is available in ./output."
+echo "Ledgerium Blockchain setup is complete now! The setup file is available in $DIRECTORY/output."
 
 printf -- '\n';
 exit 0;

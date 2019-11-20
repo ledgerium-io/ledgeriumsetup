@@ -23,31 +23,15 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
     [[ $DIST == *"centos"* ]]; then
         echo "OS: $DIST"
 
+        docker rm $(docker stop $(docker ps -aq --filter name=output_))
         cd ..
         if [ ! -d ledgeriumtools ]; then
-          echo "ledgerium ools doesnot exist, nothing to clean up"
+          echo "ledgeriumtools doesnot exist, nothing to backup"
           exit
-        fi
-
-        cd ledgeriumtools || exit
-        echo "Current folder - $PWD"
-        
-        if [ ! -d $PWD/output ]; then
-          echo "ledgeriumtools backed up with $DIR"
-          cd ..
+        else 
           mv ledgeriumtools $DIR
-        else
-          cd output
-          if [ ! -f "docker-compose.yml" ]; then 
-            cd ../..
-            mv ledgeriumtools $DIR
-            echo "No running containers found, ledgeriumtools folder is backed up with $DIR"
-          else
-            docker-compose down
-            cd ../..
-            mv ledgeriumtools $DIR
-            echo "Existing containers are stopped and the existing ledgeriumtools folder is backed up with $DIR"
-          fi
+          echo "Existing containers are stopped and ledgeriumtools folder is backed up with $DIR"
+          exit
         fi
     else
         echo "Unknown linux distribution"
@@ -57,31 +41,16 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
         # Mac OSX
         echo "OS: $OSTYPE"
 
+        docker rm $(docker stop $(docker ps -aq --filter name=output_))
         cd ..
         if [ ! -d ledgeriumtools ]; then
-          echo "ledgeriumtools doesnot exist, nothing to clean up"
+          echo "ledgeriumtools doesnot exist, nothing to backup"
+          exit
+        else 
+          mv ledgeriumtools $DIR
+          echo "Existing containers are stopped and ledgeriumtools folder is backed up with $DIR"
           exit
         fi
-        cd ledgeriumtools || exit
-        
-        if [ ! -d $PWD/output ]; then
-          cd ..
-          mv ledgeriumtools $DIR
-          echo "ledgeriumtools backed up with $DIR"
-        else
-          cd output
-          if [ ! -f "docker-compose.yml" ]; then 
-            echo "No running containers found, ledgeriumtools folder is backed up with $DIR"
-            cd ../..
-            mv ledgeriumtools $DIR
-          else
-            docker-compose down
-            cd ../..
-            mv ledgeriumtools $DIR
-            echo "Existing containers are stopped and the existing ledgeriumtools folder is backed up with $DIR"
-          fi
-        fi
-        
 elif [[ "$OSTYPE" == "cygwin" ]]; then
         # POSIX compatibility layer and Linux environment emulation for Windows
         echo "OS: $OSTYPE"

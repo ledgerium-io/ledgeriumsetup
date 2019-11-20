@@ -1,15 +1,19 @@
 #!/bin/bash
-echo "There seems to be an existing setup already. Warning: This will a hard reset. You may end up losing ledgerium accounts on your node and other data and additionally, it might take a while before the new node synch up with Ledgerium Blockchain fully. The new node may not be able to write transactions during this period. Do you really want to clean up? "
-read -p "(yes/no) : " CLEANUP
+if [[ "$(docker ps -a | grep ledgeriumengineering)" ]]; then
+    echo "There seems to be an existing setup already. Warning: This will a hard reset. You may end up losing ledgerium accounts on your node and other data and additionally, it might take a while before the new node synch up with Ledgerium Blockchain fully. The new node may not be able to write transactions during this period. Do you really want to clean up? "
+    read -p "(yes/no) : " CLEANUP
 
-if [[ $CLEANUP == "yes" ]] || [[ $CLEANUP == "y" ]]; then
-    echo "Running cleanup script"
-    ./ledgerium_cleanup.sh
-    echo "Cleanup is done and now, actual setup is starting"
-elif [[ $CLEANUP == "no" ]] || [[ $CLEANUP == "n" ]]; then
-    echo "Running setup without cleanup"
+    if [[ $CLEANUP == "yes" ]] || [[ $CLEANUP == "y" ]]; then
+        echo "Running cleanup script"
+        ./ledgerium_cleanup.sh
+        echo "Cleanup is done and now, actual setup is starting"
+    elif [[ $CLEANUP == "no" ]] || [[ $CLEANUP == "n" ]]; then
+        echo "Running setup without cleanup"
+    else
+        echo "Invalid input :: $CLEANUP"
+    fi
 else
-    echo "Invalid input :: $CLEANUP"
+    echo "No existing setup. Nothing to clean up"
 fi
 
 cd ../

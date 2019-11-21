@@ -117,17 +117,27 @@ if [ $MODE = "0" ]; then
         //Output data
         fs.writeFileSync('./initialparams.json',JSON.stringify(data))
 EOF
-    node index.js && 
-    cp ../ledgeriumnetwork/genesis.json ../ledgeriumnetwork/static-nodes.json ./output/tmp &&
-    cd output &&
-    docker-compose up -d
+    node index.js
 
-    echo "Summary:"
-    echo "  - Existing containers are stopped, and the current ledgeriumtools folder is backed up."
-    echo "  - New ledgeriumtools repository is created." 
-    echo "  - LedgeriumNetwork folder contains files 'genesis.json' and 'static-nodes.json' files. To know more about these files, please refer https://docs.ledgerium.io/docs/ledgerium-test-networks."
-    echo "  - New peer node is set up and added to $NETWORK testnet. You can check the status of the new node on https://$NETWORK.ledgerium.io/."
-    echo "  - If you want to join the block producer consortium and write transactions on the blockchain, please contact Ledgerium Foundation team."
+    # $? will be 1 if there is any error
+    if [[ $? != 0 ]]; then                   
+        echo "Error while running ledgeriumtools" && exit 1
+    else 
+        cp ../ledgeriumnetwork/genesis.json ../ledgeriumnetwork/static-nodes.json ./output/tmp &&
+        cd output &&
+        docker-compose up -d
+        if [[ $? != 0 ]]; then                   
+            echo "Error while bringing up docker containers" && exit 1
+        fi 
+        echo "Ledgerium Blockchain setup is complete now! The setup file is available in $DIRECTORY/output."
+        echo "Summary:"
+        echo "  - Existing containers are stopped, and the current ledgeriumtools folder is backed up."
+        echo "  - New ledgeriumtools repository is created." 
+        echo "  - LedgeriumNetwork folder contains files 'genesis.json' and 'static-nodes.json' files. To know more about these files, please refer https://docs.ledgerium.io/docs/ledgerium-test-networks."
+        echo "  - New peer node is set up and added to $NETWORK testnet. You can check the status of the new node on https://$NETWORK.ledgerium.io/."
+        echo "  - If you want to join the block producer consortium and write transactions on the blockchain, please contact Ledgerium Foundation team."
+    fi
+
 
 elif [ $MODE = "1" ]; then
 
@@ -185,9 +195,13 @@ EOF
 
         mkdir -p output/tmp         &&
         mkdir -p output/fullnode    &&
-        node index.js               &&
-        cd output                   &&
+        node index.js
 
+        # $? will be 1 if there is any error in nodejs application
+        if [[ $? != 0 ]]; then                   
+            echo "Error while running ledgeriumtools" && exit 1
+        fi
+        cd output
         #Read static-nodes.json
         value=$(<tmp/static-nodes.json)
         
@@ -209,6 +223,9 @@ EOF
                 echo "First node will be run in same host"
                 cp fullnode/"docker-compose_$((index-1)).yml" docker-compose.yml
                 docker-compose up -d
+                if [[ $? != 0 ]]; then                   
+                    echo "Error while bringing up docker containers" && exit 1
+                fi
             else
                 FOLDER=node_$((index-1))                                                        &&
                 mkdir -p $FOLDER/tmp                                                            &&
@@ -228,6 +245,7 @@ EOF
         done
         echo "*** Removing files from fullnode ***"
         sudo rm -rf fullnode node_*
+        echo "Ledgerium Blockchain setup is complete now! The setup file is available in $DIRECTORY/output."
     elif [ $SETUP = "0" ]; then
         echo "|***************** Executing script for local full mode ****************|"
         # Enter Network ID
@@ -278,17 +296,24 @@ EOF
         # Full mode Setup 
         mkdir -p output/tmp &&
         mkdir -p output/fullnode &&
-        node index.js &&
+        node index.js
+        # $? will be 1 if there is any error in nodejs application
+        if [[ $? != 0 ]]; then                   
+            echo "Error while running ledgeriumtools" && exit 1
+        fi
+
         cd output &&
         docker-compose up -d
+        if [[ $? != 0 ]]; then                   
+            echo "Error while bringing up docker containers" && exit 1
+        fi
+        echo "Ledgerium Blockchain setup is complete now! The setup file is available in $DIRECTORY/output."
     else 
     echo "Invalid setup value :: $SETUP"
     fi
 else
         echo "Invalid mode :: $MODE"
 fi
-
-echo "Ledgerium Blockchain setup is complete now! The setup file is available in $DIRECTORY/output."
 
 printf -- '\n';
 exit 0;

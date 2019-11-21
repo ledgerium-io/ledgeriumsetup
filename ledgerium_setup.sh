@@ -107,7 +107,7 @@ if [ $MODE = "0" ]; then
         //Manipulate data
         data.mode = "blockproducer";
         data.distributed = $FLAG;
-        data.env = "devnet";
+        data.env = "testnet";
         data.network = "$NETWORK";
         data.nodeName = "$(hostname)";
         data.domainName = "$(hostname)";
@@ -169,7 +169,7 @@ elif [ $MODE = "1" ]; then
             //Manipulate data
             data.mode = "full";
             data.distributed = true;
-            data.env = "devnet";
+            data.env = "testnet";
             data.network="flinders";
             data.nodeName = "$(hostname)";
             data.domainName = "$(hostname)";

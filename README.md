@@ -36,6 +36,7 @@ Later, it will ask for further parameters to choose among different types of nod
 ### Full and non-distributed setup
 This setup creates a network of required number of nodes, all running on same machine
 
+Required inputs from user:
 1. Type of node setup (Enter '0' for blockproducer, '1' for full) - Should be `1` for this setup
 2. Type of testnet ('0' for 'toorak' or '1' for 'flinders') - Should be `0` for this setup
 3. Number of nodes
@@ -43,6 +44,8 @@ This setup creates a network of required number of nodes, all running on same ma
 
 ### Full and distributed setup
 This setup creates a network of required number of nodes, where hostnode runs on the same machine where script is running and other nodes each running on different machine.
+
+Required inputs from user:
 1. Type of node setup (Enter '0' for blockproducer, '1' for full) - Should be `1` for this setup
 2. Type of testnet ('0' for 'toorak' or '1' for 'flinders') - Should be `1` for this setup
 3. Number of nodes
@@ -51,6 +54,9 @@ This setup creates a network of required number of nodes, where hostnode runs on
 Note: This setup creates docker-compose.yml files in in each machine. So, user should be aware of usernames and passwords of other machines before running this setup.
 
 ### Blockproducer setup
+This setup creates a blockproducer node and connects to toorak/flinders network
+
+Required inputs from user:
 1. Type of node setup (Enter '0' for blockproducer, '1' for full) - Should be `0` for this setup
 2. Type of testnet ('0' for 'toorak' or '1' for 'flinders') - Can be `0` or `1` based on the network to connect to.
 3. IP address, domain name, validator name, mnemonic and password for each node

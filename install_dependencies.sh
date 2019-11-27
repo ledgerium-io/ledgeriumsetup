@@ -32,8 +32,13 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
             echo "Installing latest version of docker ce"
             sudo apt-get install -y docker-ce
 
-            echo "Testing docker"
-            sudo docker run hello-world 
+            echo "Testing docker by running hello-world"
+            sudo docker run --name hello-world hello-world
+
+            echo "Removing hello-world container and image"
+            sudo docker stop hello-world
+            sudo docker rm hello-world
+            sudo docker rmi hello-world
 
             echo "Add USER to docker group"
             sudo groupadd docker
@@ -79,8 +84,13 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
             sudo yum install docker-ce docker-ce-cli containerd.io -y
             sudo systemctl start docker
 
-            echo "Testing docker"
-            sudo docker run hello-world 
+            echo "Testing docker by running hello-world"
+            sudo docker run --name hello-world hello-world
+
+            echo "Removing hello-world container and image"
+            sudo docker stop hello-world
+            sudo docker rm hello-world
+            sudo docker rmi hello-world 
 
             echo "Add USER to docker group"
             sudo groupadd docker
@@ -111,8 +121,13 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
             echo "Install git"
             sudo brew install git
 
-            echo "Testing docker"
-            sudo docker run hello-world 
+            echo "Testing docker by running hello-world"
+            sudo docker run --name hello-world hello-world
+
+            echo "Removing hello-world container and image"
+            sudo docker stop hello-world
+            sudo docker rm hello-world
+            sudo docker rmi hello-world
 
             echo "Installing NodeJS"
             brew install node

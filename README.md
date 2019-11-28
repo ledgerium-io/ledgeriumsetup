@@ -5,7 +5,7 @@ Provides a shell script to deploy nodes in full/blockproducer mode
 ## Install Dependencies
 
 ```
-bash ./install_dependencies.sh
+./install_dependencies.sh
 ```
 This script does the following:
 * Checks OS version (Ubuntu/centos)
